@@ -3,6 +3,7 @@ package de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10;
 import com.mojang.authlib.GameProfile;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.chat.ChatComponent;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.chunks.ChunkPacketTransformer;
+import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.providers.GameProfileProvider;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.storage.Tablist;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.storage.Windows;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.types.CustomStringType;
@@ -25,6 +26,7 @@ import us.myles.ViaVersion.api.type.types.VoidType;
 import us.myles.ViaVersion.api.type.types.version.Types1_8;
 import us.myles.ViaVersion.packets.State;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.types.CustomIntType;
+import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.util.GsonUtil;
 
 import java.util.ArrayList;
@@ -847,9 +849,10 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 							packetWrapper.write(Type.UUID, entry.uuid);
 							tablist.remove(entry);
 						} else if (online && entry==null) {
-							if (name.equals(The5zigAPI.getAPI().getGameProfile().getName())) {
-								entry = new Tablist.TabListEntry(name, The5zigAPI.getAPI().getGameProfile().getId());
-								for (Map.Entry<String, com.mojang.authlib.properties.Property> propertyEntry : The5zigAPI.getAPI().getGameProfile().getProperties().entries()) {
+							GameProfile gameProfile = Via.getManager().getProviders().get(GameProfileProvider.class).getGameProfile(name);
+							if (gameProfile!=null) {
+								entry = new Tablist.TabListEntry(name, gameProfile.getId());
+								for (Map.Entry<String, com.mojang.authlib.properties.Property> propertyEntry : gameProfile.getProperties().entries()) {
 									com.mojang.authlib.properties.Property property = propertyEntry.getValue();
 									entry.properties.add(new Tablist.Property(property.getName(), property.getValue(), property.getSignature()));
 								}
@@ -991,7 +994,8 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 									PacketWrapper add = new PacketWrapper(0x38, null, packetWrapper.user());
 									add.write(Type.VAR_INT, 0);
 									add.write(Type.VAR_INT, 1);
-									GameProfile profile = The5zigAPI.getAPI().getGameProfile();
+									UUID uuid = packetWrapper.user().get(ProtocolInfo.class).getUuid();
+									GameProfile profile = Via.getManager().getProviders().get(GameProfileProvider.class).getGameProfile(uuid);
 									
 									Tablist tablist = packetWrapper.user().get(Tablist.class);
 									

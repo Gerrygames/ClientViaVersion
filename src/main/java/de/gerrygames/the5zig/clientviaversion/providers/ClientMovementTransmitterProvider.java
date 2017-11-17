@@ -1,4 +1,4 @@
-package de.gerrygames.the5zig.clientviaversion.protocols.protocol1_9to1_8.providers;
+package de.gerrygames.the5zig.clientviaversion.providers;
 
 import de.gerrygames.the5zig.clientviaversion.main.ClientViaVersion;
 import de.gerrygames.the5zig.clientviaversion.netty.ViaTransformerOut;

@@ -1,7 +1,9 @@
 package de.gerrygames.the5zig.clientviaversion.main;
 
 import de.gerrygames.the5zig.clientviaversion.Version;
-import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_9to1_8.providers.ClientMovementTransmitterProvider;
+import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.providers.GameProfileProvider;
+import de.gerrygames.the5zig.clientviaversion.providers.ClientGameProfileProvider;
+import de.gerrygames.the5zig.clientviaversion.providers.ClientMovementTransmitterProvider;
 import de.gerrygames.the5zig.clientviaversion.utils.Utils;
 import de.gerrygames.the5zig.clientviaversion.viaversion.CustomViaInjector;
 import eu.the5zig.mod.The5zigAPI;
@@ -33,7 +35,7 @@ import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_7_1_5.Protocol1_7_6_10to1_7_1_5;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.Protocol1_8TO1_7_6_10;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
-import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_9to1_8.providers.ClientHandItemProvider;
+import de.gerrygames.the5zig.clientviaversion.providers.ClientHandItemProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.HandItemProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
 
@@ -115,6 +117,7 @@ public class ClientViaVersion {
 		new CustomViaBackwardsPlatform();
 		Via.getManager().getProviders().use(HandItemProvider.class, new ClientHandItemProvider());
 		Via.getManager().getProviders().use(MovementTransmitterProvider.class, new ClientMovementTransmitterProvider());
+		Via.getManager().getProviders().use(GameProfileProvider.class, new ClientGameProfileProvider());
 
 		ProtocolVersion.register(new ProtocolVersion(5, "1.7.6-10"));
 		ProtocolRegistry.registerProtocol(new Protocol1_8TO1_7_6_10(), Collections.singletonList(47), 5);
