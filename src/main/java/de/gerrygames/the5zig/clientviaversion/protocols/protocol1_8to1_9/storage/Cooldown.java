@@ -21,7 +21,8 @@ public class Cooldown extends StoredObject {
 			@Override
 			public void run() {
 				if (!hasCooldown()) return;
-				if (getUser().get(BlockPlaceDestroyTracker.class).isMining()) {
+				BlockPlaceDestroyTracker tracker = getUser().get(BlockPlaceDestroyTracker.class);
+				if (tracker.isMining() || System.currentTimeMillis()-tracker.getLastMining()<50) {
 					lastHit = 0;
 					PacketWrapper hide = new PacketWrapper(0x45, null, getUser());
 					hide.write(Type.VAR_INT, 3);
@@ -111,7 +112,7 @@ public class Cooldown extends StoredObject {
 
 	public void hit() {
 		BlockPlaceDestroyTracker tracker = getUser().get(BlockPlaceDestroyTracker.class);
-		if (tracker.isMining() || System.currentTimeMillis()-tracker.getBlockPlaced()<25 || System.currentTimeMillis()-tracker.getLastMining()<25) return;
+		if (tracker.isMining() || System.currentTimeMillis()-tracker.getBlockPlaced()<100 || System.currentTimeMillis()-tracker.getLastMining()<100) return;
 		lastHit = System.currentTimeMillis();
 	}
 

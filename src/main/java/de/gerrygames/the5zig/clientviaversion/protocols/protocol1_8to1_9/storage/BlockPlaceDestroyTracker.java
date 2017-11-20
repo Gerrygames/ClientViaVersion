@@ -20,15 +20,22 @@ public class BlockPlaceDestroyTracker extends StoredObject {
 	}
 
 	public boolean isMining() {
+		//mining = mining && System.currentTimeMillis()-lastMining<65;  //no animation packet in last tick -> no longer minig
 		return mining;
 	}
 
 	public void setMining(boolean mining) {
-		this.mining = mining;
+		this.mining = mining && getUser().get(EntityTracker.class).getPlayerGamemode()!=1;
 		lastMining = System.currentTimeMillis();
 	}
 
 	public long getLastMining() {
 		return lastMining;
+	}
+
+	public void updateMinig() {
+		if (this.mining) {
+			lastMining = System.currentTimeMillis();
+		}
 	}
 }

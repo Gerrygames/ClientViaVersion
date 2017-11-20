@@ -14,7 +14,6 @@ import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_9.storage
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_9.storage.PlayerPosition;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Pair;
-import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_10Types;
 import us.myles.ViaVersion.api.minecraft.item.Item;
@@ -31,7 +30,6 @@ import us.myles.ViaVersion.packets.State;
 import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -56,7 +54,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 
 	@Override
 	protected void registerPackets() {
-		this.registerOutgoing(State.PLAY, 0x00, 0x0E, new PacketRemapper() {
+		this.registerOutgoing(State.PLAY, 0x00, 0x0E, new PacketRemapper() {  //Spawn Object
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -106,7 +104,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x01, 0x11, new PacketRemapper() {
+		this.registerOutgoing(State.PLAY, 0x01, 0x11, new PacketRemapper() {  //Spawn Experience Orb
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -126,7 +124,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x02, 0x2C, new PacketRemapper() {
+		this.registerOutgoing(State.PLAY, 0x02, 0x2C, new PacketRemapper() {  //Spawn Global Entity
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -146,7 +144,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x03, 0x0F, new PacketRemapper() {
+		this.registerOutgoing(State.PLAY, 0x03, 0x0F, new PacketRemapper() {  //Spawn Mob
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -172,7 +170,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 						tracker.sendMetadataBuffer(entityID);
 					}
 				});
-				this.handler(new PacketHandler() {
+				handler(new PacketHandler() {
 					public void handle(PacketWrapper wrapper) throws Exception {
 						List<Metadata> metadataList = wrapper.get(Types1_8.METADATA_LIST, 0);
 						int entityID = wrapper.get(Type.VAR_INT, 0);
@@ -187,7 +185,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x04, 0x10, new PacketRemapper() {
+		this.registerOutgoing(State.PLAY, 0x04, 0x10, new PacketRemapper() {  //Spawn Painting
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -207,7 +205,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x05, 0x0C, new PacketRemapper() {  //spawn player
+		this.registerOutgoing(State.PLAY, 0x05, 0x0C, new PacketRemapper() {  //Spawn Player
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -446,7 +444,21 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x1E, 0x2B);  //Change Game State
+		this.registerOutgoing(State.PLAY, 0x1E, 0x2B, new PacketRemapper() {  //Change Game State
+			@Override
+			public void registerMap() {
+				map(Type.UNSIGNED_BYTE);
+				map(Type.FLOAT);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						int reason = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
+						if (reason==3)
+							packetWrapper.user().get(EntityTracker.class).setPlayerGamemode(packetWrapper.get(Type.FLOAT, 0).intValue());
+					}
+				});
+			}
+		});
 
 		this.registerOutgoing(State.PLAY, 0x1F, 0x00);  //Keep Alive
 
@@ -491,8 +503,10 @@ public class Protocol1_8TO1_9 extends Protocol {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.user().get(EntityTracker.class).setPlayerId(packetWrapper.get(Type.INT, 0));
-					}
+						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+						tracker.setPlayerId(packetWrapper.get(Type.INT, 0));
+						tracker.setPlayerGamemode(packetWrapper.get(Type.UNSIGNED_BYTE, 0));
+						}
 				});
 			}
 		});
@@ -645,7 +659,21 @@ public class Protocol1_8TO1_9 extends Protocol {
 
 		this.registerOutgoing(State.PLAY, 0x32, 0x48);  //Resource Pack Send
 
-		this.registerOutgoing(State.PLAY, 0x33, 0x07);  //Respawn
+		this.registerOutgoing(State.PLAY, 0x33, 0x07, new PacketRemapper() {  //Respawn
+			@Override
+			public void registerMap() {
+				map(Type.INT);
+				map(Type.UNSIGNED_BYTE);
+				map(Type.UNSIGNED_BYTE);
+				map(Type.STRING);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						packetWrapper.user().get(EntityTracker.class).setPlayerGamemode(packetWrapper.get(Type.UNSIGNED_BYTE, 1));
+					}
+				});
+			}
+		});
 
 		this.registerOutgoing(State.PLAY, 0x34, 0x19);  //Entity Head Look
 
@@ -669,17 +697,11 @@ public class Protocol1_8TO1_9 extends Protocol {
 						EntityTracker tracker = wrapper.user().get(EntityTracker.class);
 						if (tracker.getClientEntityTypes().containsKey(entityID)) {
 							MetadataRewriter.transform(tracker.getClientEntityTypes().get(entityID), metadataList);
+							if (metadataList.isEmpty()) wrapper.cancel();
 						} else {
 							tracker.addMetadataToBuffer(entityID, metadataList);
 							wrapper.cancel();
 						}
-					}
-				});
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						List<Metadata> metadataList = packetWrapper.get(Types1_8.METADATA_LIST, 0);
-						if (metadataList.isEmpty()) packetWrapper.cancel();
 					}
 				});
 			}
@@ -1123,31 +1145,21 @@ public class Protocol1_8TO1_9 extends Protocol {
 			public void registerMap() {
 				create(new ValueCreator() {
 					@Override
-					public void write(final PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.write(Type.VAR_INT, 0);  //Main Hand
+					public void write(PacketWrapper packetWrapper) throws Exception {
 						packetWrapper.cancel();
+						final PacketWrapper delayedPacket = new PacketWrapper(0x1A, null, packetWrapper.user());
+						delayedPacket.write(Type.VAR_INT, 0);  //Main Hand
 						//delay packet in order to deal damage to entites
 						//the cooldown value gets reset by this packet
 						//1.8 sends it before the use entity packet
 						//1.9 afterwards
-						Via.getPlatform().runSync(new Runnable() {
-							@Override
-							public void run() {
-								try {
-									Field field = PacketWrapper.class.getDeclaredField("send");
-									field.setAccessible(true);
-									field.set(packetWrapper, true);
-									ViaTransformerOut.sendToServer(packetWrapper, Protocol1_8TO1_9.class, true, true);
-								} catch (Exception ex) {
-									ex.printStackTrace();
-								}
-							}
-						});
+						ViaTransformerOut.sendToServer(delayedPacket, Protocol1_8TO1_9.class, true, false);
 					}
 				});
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
+						packetWrapper.user().get(BlockPlaceDestroyTracker.class).updateMinig();
 						packetWrapper.user().get(Cooldown.class).hit();
 					}
 				});

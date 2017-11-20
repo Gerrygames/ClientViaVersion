@@ -94,14 +94,22 @@ public class Injector {
 			UserConnection user = ClientViaVersion.user = new UserConnection((SocketChannel) channel) {
 				@Override
 				public void sendRawPacket(final ByteBuf packet, boolean currentThread) {
-					Channel channel = this.getChannel();
-					channel.eventLoop().submit(new Runnable() {
-						public void run() {
-							try {
-								channel.pipeline().get("decoder").channelRead(channel.pipeline().context("decoder"), packet);
-							} catch (Exception e) {e.printStackTrace();}
-						}
-					});
+					final Channel channel = this.getChannel();
+					if (currentThread) {
+						try {
+							channel.pipeline().context("viatransformerin").fireChannelRead(packet);
+							//channel.pipeline().get("decoder").channelRead(channel.pipeline().context("decoder"), packet);
+						} catch (Exception e) {e.printStackTrace();}
+					} else {
+						channel.eventLoop().submit(new Runnable() {
+							public void run() {
+								try {
+									channel.pipeline().context("viatransformerin").fireChannelRead(packet);
+									//channel.pipeline().get("decoder").channelRead(channel.pipeline().context("decoder"), packet);
+								} catch (Exception e) {e.printStackTrace();}
+							}
+						});
+					}
 				}
 				@Override
 				public ChannelFuture sendRawPacketFuture(ByteBuf packet) {

@@ -21,6 +21,7 @@ public class EntityTracker extends StoredObject {
 	private final Map<Integer, Entity1_10Types.EntityType> clientEntityTypes = new ConcurrentHashMap();
 	private final Map<Integer, List<Metadata>> metadataBuffer = new ConcurrentHashMap();
 	private int playerId;
+	private int playerGamemode = 0;
 
 	public EntityTracker(UserConnection user) {
 		super(user);
@@ -32,6 +33,14 @@ public class EntityTracker extends StoredObject {
 
 	public int getPlayerId() {
 		return playerId;
+	}
+
+	public int getPlayerGamemode() {
+		return playerGamemode;
+	}
+
+	public void setPlayerGamemode(int playerGamemode) {
+		this.playerGamemode = playerGamemode;
 	}
 
 	public void removeEntity(int entityId) {

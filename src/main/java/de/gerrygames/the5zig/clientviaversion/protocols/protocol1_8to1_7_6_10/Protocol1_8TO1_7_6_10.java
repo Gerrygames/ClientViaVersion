@@ -3,7 +3,9 @@ package de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10;
 import com.mojang.authlib.GameProfile;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.chat.ChatComponent;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.chunks.ChunkPacketTransformer;
+import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.metadata.MetadataRewriter;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.providers.GameProfileProvider;
+import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.storage.EntityTracker;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.storage.Tablist;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.storage.Windows;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.types.CustomStringType;
@@ -16,6 +18,7 @@ import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.st
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.entities.Entity1_10Types;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
@@ -202,6 +205,7 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 						byte pitch = packetWrapper.read(Type.BYTE);  //pitch
 						short item = packetWrapper.read(Type.SHORT);  //Item in hand
 						List<Metadata> metadata = packetWrapper.read(Types1_7_6_10.METADATA_LIST);  //Metadata
+						MetadataRewriter.transform(Entity1_10Types.EntityType.PLAYER, metadata);
 
 						Tablist tablist = packetWrapper.user().get(Tablist.class);
 						Tablist.TabListEntry entryByName = tablist.getTabListEntry(name);
@@ -260,7 +264,7 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 								@Override
 								public void run() {
 									try {
-										delayedPacket.send(Protocol1_8TO1_7_6_10.class, true, false);
+										delayedPacket.send(Protocol1_8TO1_7_6_10.class);
 									} catch (Exception ex) {ex.printStackTrace();}
 								}
 							}, 1L);
@@ -276,6 +280,15 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 							packetWrapper.write(Type.SHORT, item);
 							packetWrapper.write(Types1_8.METADATA_LIST, metadata);
 						}
+					}
+				});
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						int entityID = packetWrapper.get(Type.VAR_INT, 0);
+						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+						tracker.getClientEntityTypes().put(entityID, Entity1_10Types.EntityType.PLAYER);
+						tracker.sendMetadataBuffer(entityID);
 					}
 				});
 			}
@@ -295,16 +308,22 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
+				map(Type.BYTE);
+				map(Type.INT);
+				map(Type.INT);
+				map(Type.INT);
+				map(Type.BYTE);
+				map(Type.BYTE);
+				map(Type.INT);
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						byte type = packetWrapper.read(Type.BYTE);
-						int x = packetWrapper.read(Type.INT);
-						int y = packetWrapper.read(Type.INT);
-						int z = packetWrapper.read(Type.INT);
-						byte pitch = packetWrapper.read(Type.BYTE);
-						byte yaw = packetWrapper.read(Type.BYTE);
-						int data = packetWrapper.read(Type.INT);
+						byte type = packetWrapper.get(Type.BYTE, 0);
+						int x = packetWrapper.get(Type.INT, 0);
+						int y = packetWrapper.get(Type.INT, 1);
+						int z = packetWrapper.get(Type.INT, 2);
+						byte yaw = packetWrapper.get(Type.BYTE, 2);
+						int data = packetWrapper.get(Type.INT, 3);
 
 						if (type == 71) {
 							switch(data) {
@@ -335,15 +354,66 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 
 						if (type == 50 || type == 70 || type == 74) y -= 16;
 
-						packetWrapper.write(Type.BYTE, type);
-						packetWrapper.write(Type.INT, x);
-						packetWrapper.write(Type.INT, y);
-						packetWrapper.write(Type.INT, z);
-						packetWrapper.write(Type.BYTE, pitch);
-						packetWrapper.write(Type.BYTE, yaw);
-						packetWrapper.write(Type.INT, data);
+						packetWrapper.set(Type.INT, 0, x);
+						packetWrapper.set(Type.INT, 1, y);
+						packetWrapper.set(Type.INT, 2, z);
+						packetWrapper.set(Type.BYTE, 2, yaw);
+						packetWrapper.set(Type.INT, 3, data);
 					}
 				});
+				handler(new PacketHandler() {
+					@Override
+					public void handle(final PacketWrapper packetWrapper) throws Exception {
+						final int entityID = packetWrapper.get(Type.VAR_INT, 0);
+						final int typeID = packetWrapper.get(Type.BYTE, 0);
+						final EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+						final Entity1_10Types.EntityType type = Entity1_10Types.getTypeFromId(typeID, true);
+						tracker.getClientEntityTypes().put(entityID, type);
+						tracker.sendMetadataBuffer(entityID);
+					}
+				});
+			}
+		});
+
+		//Spawn Mob
+		this.registerOutgoing(State.PLAY, 0x0F, 0x0F, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.VAR_INT);
+				map(Type.UNSIGNED_BYTE);
+				map(Type.INT);
+				map(Type.INT);
+				map(Type.INT);
+				map(Type.BYTE);
+				map(Type.BYTE);
+				map(Type.BYTE);
+				map(Type.SHORT);
+				map(Type.SHORT);
+				map(Type.SHORT);
+				map(Types1_7_6_10.METADATA_LIST, Types1_8.METADATA_LIST);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						int entityID = packetWrapper.get(Type.VAR_INT, 0);
+						int typeID = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
+						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+						tracker.getClientEntityTypes().put(entityID, Entity1_10Types.getTypeFromId(typeID, false));
+						tracker.sendMetadataBuffer(entityID);
+					}
+				});
+				handler(new PacketHandler() {
+					public void handle(PacketWrapper wrapper) throws Exception {
+						List<Metadata> metadataList = wrapper.get(Types1_8.METADATA_LIST, 0);
+						int entityID = wrapper.get(Type.VAR_INT, 0);
+						EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+						if (tracker.getClientEntityTypes().containsKey(entityID)) {
+							MetadataRewriter.transform(tracker.getClientEntityTypes().get(entityID), metadataList);
+						} else {
+							wrapper.cancel();
+						}
+					}
+				});
+
 			}
 		});
 
@@ -355,6 +425,36 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 				map(Type.STRING);  //Title
 				map(xyzToPosition, new TypeRemapper<>(Type.POSITION));  //Position
 				map(Type.UNSIGNED_BYTE);  //Rotation
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						int entityID = packetWrapper.get(Type.VAR_INT, 0);
+						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+						tracker.getClientEntityTypes().put(entityID, Entity1_10Types.EntityType.PAINTING);
+						tracker.sendMetadataBuffer(entityID);
+					}
+				});
+			}
+		});
+
+		//Spawn Experience Orb
+		this.registerOutgoing(State.PLAY, 0x11, 0x11, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.VAR_INT);
+				map(Type.INT);
+				map(Type.INT);
+				map(Type.INT);
+				map(Type.SHORT);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						int entityID = packetWrapper.get(Type.VAR_INT, 0);
+						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+						tracker.getClientEntityTypes().put(entityID, Entity1_10Types.EntityType.EXPERIENCE_ORB);
+						tracker.sendMetadataBuffer(entityID);
+					}
+				});
 			}
 		});
 
@@ -382,6 +482,13 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 						packetWrapper.write(Type.VAR_INT_ARRAY, entityIds);
 					}
 				});  //Entity Id Array
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+						for (int entityId : packetWrapper.get(Type.VAR_INT_ARRAY, 0)) tracker.removeEntity(entityId);
+					}
+				});
 			}
 		});
 
@@ -479,6 +586,20 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 			public void registerMap() {
 				map(Type.INT, Type.VAR_INT);  //Entity Id
 				map(Types1_7_6_10.METADATA_LIST, Types1_8.METADATA_LIST);  //MetadataType
+				handler(new PacketHandler() {
+					public void handle(PacketWrapper wrapper) throws Exception {
+						List<Metadata> metadataList = wrapper.get(Types1_8.METADATA_LIST, 0);
+						int entityID = wrapper.get(Type.VAR_INT, 0);
+						EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+						if (tracker.getClientEntityTypes().containsKey(entityID)) {
+							MetadataRewriter.transform(tracker.getClientEntityTypes().get(entityID), metadataList);
+							if (metadataList.isEmpty()) wrapper.cancel();
+						} else {
+							tracker.addMetadataToBuffer(entityID, metadataList);
+							wrapper.cancel();
+						}
+					}
+				});
 			}
 		});
 
@@ -697,6 +818,27 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 							}
 							packetWrapper.write(Type.VAR_INT, toWrite);
 						}
+					}
+				});
+			}
+		});
+
+		//Spawn Global Entity
+		this.registerOutgoing(State.PLAY, 0x2C, 0x2C, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.VAR_INT);
+				map(Type.BYTE);
+				map(Type.INT);
+				map(Type.INT);
+				map(Type.INT);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						int entityID = packetWrapper.get(Type.VAR_INT, 0);
+						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+						tracker.getClientEntityTypes().put(entityID, Entity1_10Types.EntityType.LIGHTNING);
+						tracker.sendMetadataBuffer(entityID);
 					}
 				});
 			}
@@ -1008,7 +1150,7 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 										remove.write(Type.VAR_INT, 1);
 										remove.write(Type.UUID, oldEntry.uuid);
 										try {
-											remove.send(Protocol1_8TO1_7_6_10.class, true, false);
+											remove.send(Protocol1_8TO1_7_6_10.class);
 										} catch (Exception ex) {ex.printStackTrace();}
 										tablist.remove(oldEntry);
 									}
@@ -1033,7 +1175,7 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 									}
 									tablist.add(entry);
 									try {
-										add.send(Protocol1_8TO1_7_6_10.class, true, false);
+										add.send(Protocol1_8TO1_7_6_10.class);
 									} catch (Exception ex) {ex.printStackTrace();}
 								}
 							});
@@ -1172,21 +1314,24 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 							z = (int) (pos << 38 >> 38);
 
 						}
-						byte direction = packetWrapper.read(Type.BYTE);  //Direction
 						packetWrapper.write(Type.INT, x);
 						packetWrapper.write(Type.UNSIGNED_BYTE, y);
 						packetWrapper.write(Type.INT, z);
-						packetWrapper.write(Type.BYTE, direction);
+						byte direction = packetWrapper.passthrough(Type.BYTE);  //Direction
 						VoidType voidType = new VoidType();
 						if (packetWrapper.isReadable(voidType, 0)) packetWrapper.read(voidType);
 						Item item = packetWrapper.read(Type.ITEM);
-						packetWrapper.write(Types1_7_6_10.ITEM, item);
+						packetWrapper.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, item);
 
 						if (isPlayerInsideBlock(x, y, z, direction) && !isPlaceable(item.getId())) packetWrapper.cancel();
 
 						for (int i = 0; i<3; i++) {
-							Type type = packetWrapper.isReadable(Type.BYTE, 0) ? Type.BYTE : Type.UNSIGNED_BYTE;
-							packetWrapper.write(type, packetWrapper.read(type));
+							if (packetWrapper.isReadable(Type.BYTE, 0)) {
+								packetWrapper.passthrough(Type.BYTE);
+							} else {
+								short cursor = packetWrapper.read(Type.UNSIGNED_BYTE);
+								packetWrapper.write(Type.BYTE, (byte)cursor);
+							}
 						}
 					}
 				});
@@ -1405,6 +1550,7 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 		userConnection.put(new Tablist(userConnection));
 		userConnection.put(new Windows(userConnection));
 		userConnection.put(new Scoreboard(userConnection));
+		userConnection.put(new EntityTracker(userConnection));
 	}
 
 	private boolean isPlayerInsideBlock(long x, long y, long z, byte direction) {

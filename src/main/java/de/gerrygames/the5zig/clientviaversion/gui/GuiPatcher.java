@@ -15,6 +15,7 @@ public class GuiPatcher {
 	public static Object prevScreen;
 	private static Method addButton;
 	private static Field buttons;
+	private static boolean liquidBouncePresent = false;
 	static {
 		if (ClientViaVersion.CLIENT_PROTOCOL_VERSION > 47) {
 			addButton = ClassNameUtils.getGuiScreenAddButtonMethod();
@@ -22,6 +23,11 @@ public class GuiPatcher {
 		} else {
 			buttons = ClassNameUtils.getGuiScreenButtonsField();
 		}
+		try {
+			Class.forName("net.ccbluex.LiquidBounce.injection.MixinLoader");
+			The5zigMod.logger.info("[ClientViaVersion] Found LiquidBounce. Cheaters are bad!");
+			liquidBouncePresent = true;
+		} catch (ClassNotFoundException ignored) {}
 	}
 
 	private static void addButton(Object gui, Object button) throws Exception {
@@ -50,7 +56,7 @@ public class GuiPatcher {
 	}
 
 	public static void patchGuiMultiplayer(Object gui) throws Exception {
-		addButton(gui, ClassNameUtils.getVersionButtonClass().getConstructor(int.class, int.class, int.class, int.class, int.class, String.class).newInstance(420, 8, 6, 60, 20, ClientViaVersion.selected.getName()));
+		addButton(gui, ClassNameUtils.getVersionButtonClass().getConstructor(int.class, int.class, int.class, int.class, int.class, String.class).newInstance(420, liquidBouncePresent ? 206 : 8, liquidBouncePresent ? 8 : 6, 60, 20, ClientViaVersion.selected.getName()));
 	}
 
 	private static HashMap<String, Integer> versions = new HashMap<>();
@@ -106,7 +112,7 @@ public class GuiPatcher {
 		int width = (int) ClassNameUtils.getGuiScreenWidthField().get(gui);
 		int height = (int) ClassNameUtils.getGuiScreenHeightField().get(gui);
 		int textHeight = (int) ClassNameUtils.getGuiDisconnectedTextHeightField().get(gui);
-		addButton(gui, ClassNameUtils.getVersionReconnectButtonClass().getConstructor(int.class, int.class, int.class, int.class, int.class, String.class, ProtocolVersion.class).newInstance(420, width / 2 - 100, Math.min(height / 2 + textHeight / 2 + 9, height - 30) + 25, 200, 20, "Reconnect with " + protocolVersion.getName() + " Protocol", protocolVersion));
+		addButton(gui, ClassNameUtils.getVersionReconnectButtonClass().getConstructor(int.class, int.class, int.class, int.class, int.class, String.class, ProtocolVersion.class).newInstance(420, width / 2 - 100, Math.min(height / 2 + textHeight / 2 + 9, height - 30) + (liquidBouncePresent ? 85 : 25), 200, 20, "Reconnect with " + protocolVersion.getName() + " Protocol", protocolVersion));
 	}
 
 	private static boolean contains(String message, String version) {

@@ -4,7 +4,6 @@ import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.entities.Entity1_10Types;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetaIndex;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Optional;
 
