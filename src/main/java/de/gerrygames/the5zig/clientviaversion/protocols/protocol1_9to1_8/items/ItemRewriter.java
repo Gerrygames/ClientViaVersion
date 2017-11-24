@@ -1,4 +1,4 @@
-package de.gerrygames.the5zig.clientviaversion.protocols.protocol1_9to1_8;
+package de.gerrygames.the5zig.clientviaversion.protocols.protocol1_9to1_8.items;
 
 import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.IntTag;

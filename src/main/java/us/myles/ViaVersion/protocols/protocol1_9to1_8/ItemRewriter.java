@@ -184,7 +184,7 @@ public class ItemRewriter {
 				item.setTag(tag);
 				item.setData((short) data);
 			}
-			de.gerrygames.the5zig.clientviaversion.protocols.protocol1_9to1_8.ItemRewriter.fixWeaponToServer(item);
+			de.gerrygames.the5zig.clientviaversion.protocols.protocol1_9to1_8.items.ItemRewriter.fixWeaponToServer(item);
 		}
 	}
 
@@ -275,7 +275,7 @@ public class ItemRewriter {
 				}
 				item.setTag(tag);
 			}
-			de.gerrygames.the5zig.clientviaversion.protocols.protocol1_9to1_8.ItemRewriter.fixWeaponToClient(item);
+			de.gerrygames.the5zig.clientviaversion.protocols.protocol1_9to1_8.items.ItemRewriter.fixWeaponToClient(item);
 		}
 	}
 

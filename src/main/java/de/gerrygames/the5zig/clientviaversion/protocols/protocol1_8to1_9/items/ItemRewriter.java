@@ -36,7 +36,7 @@ public class ItemRewriter {
 		CompoundTag tag = item.getTag();
 		if (tag==null) item.setTag(tag = new CompoundTag(""));
 
-		CompoundTag viaVersionTag = new CompoundTag("ClientViaVersion");
+		CompoundTag viaVersionTag = new CompoundTag("ClientViaVersion1_8to1_9");
 		tag.put(viaVersionTag);
 
 		viaVersionTag.put(new ShortTag("id", item.getId()));
@@ -131,10 +131,10 @@ public class ItemRewriter {
 			item.setData((short)0);
 		}
 
-		 if (tag==null || !item.getTag().contains("ClientViaVersion")) return item;
+		 if (tag==null || !item.getTag().contains("ClientViaVersion1_8to1_9")) return item;
 
 
-		CompoundTag viaVersionTag = tag.remove("ClientViaVersion");
+		CompoundTag viaVersionTag = tag.remove("ClientViaVersion1_8to1_9");
 
 		item.setId((Short) viaVersionTag.get("id").getValue());
 		item.setData((Short) viaVersionTag.get("data").getValue());
