@@ -105,7 +105,6 @@ public class MetadataRewriter {
 							list.remove(entry);
 							break;
 					}
-					//System.out.println("old: " + metaIndex.getOldType() + " new: " + metaIndex.getNewType() + " real: " + entry.getMetaType() + " value:" + entry.getValue() + " class: " + entry.getValue().getClass());
 				} else {
 					throw new Exception("Could not find valid metadata");
 				}

@@ -91,7 +91,7 @@ public class ItemRewriter {
 			for (int i = 0; i<attributes.size(); i++) {
 				CompoundTag attribute = attributes.get(i);
 				String name = (String) attribute.get("AttributeName").getValue();
-				if (name.equals("generic.armor") || name.equals("generic.armorToughness")) {
+				if (name.equals("generic.armor") || name.equals("generic.armorToughness") || name.equals("generic.attackSpeed") || name.equals("generic.luck")) {
 					attributes.remove(attribute);
 					i--;
 				}

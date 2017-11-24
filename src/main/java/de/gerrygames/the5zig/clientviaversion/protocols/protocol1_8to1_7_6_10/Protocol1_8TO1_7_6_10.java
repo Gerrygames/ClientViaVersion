@@ -15,6 +15,8 @@ import eu.the5zig.util.minecraft.ChatColor;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.storage.Scoreboard;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -187,8 +189,9 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						int entityId = packetWrapper.read(Type.VAR_INT);  //Entity Id
+						int entityId = packetWrapper.passthrough(Type.VAR_INT);  //Entity Id
 						UUID uuid = UUID.fromString(packetWrapper.read(Type.STRING));  //UUID
+						packetWrapper.write(Type.UUID, uuid);
 						String name = ChatColor.stripColor(packetWrapper.read(Type.STRING));  //Name
 						int dataCount = packetWrapper.read(Type.VAR_INT);  //DataCunt
 						ArrayList<Tablist.Property> properties = new ArrayList<>();
@@ -198,14 +201,15 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 							String signature = packetWrapper.read(Type.STRING);  //Signature
 							properties.add(new Tablist.Property(key, value, signature));
 						}
-						int x = packetWrapper.read(Type.INT);  //x
-						int y = packetWrapper.read(Type.INT);  //y
-						int z = packetWrapper.read(Type.INT);  //z
-						byte yaw = packetWrapper.read(Type.BYTE);  //yaw
-						byte pitch = packetWrapper.read(Type.BYTE);  //pitch
-						short item = packetWrapper.read(Type.SHORT);  //Item in hand
+						int x = packetWrapper.passthrough(Type.INT);  //x
+						int y = packetWrapper.passthrough(Type.INT);  //y
+						int z = packetWrapper.passthrough(Type.INT);  //z
+						byte yaw = packetWrapper.passthrough(Type.BYTE);  //yaw
+						byte pitch = packetWrapper.passthrough(Type.BYTE);  //pitch
+						short item = packetWrapper.passthrough(Type.SHORT);  //Item in hand
 						List<Metadata> metadata = packetWrapper.read(Types1_7_6_10.METADATA_LIST);  //Metadata
 						MetadataRewriter.transform(Entity1_10Types.EntityType.PLAYER, metadata);
+						packetWrapper.write(Types1_8.METADATA_LIST, metadata);
 
 						Tablist tablist = packetWrapper.user().get(Tablist.class);
 						Tablist.TabListEntry entryByName = tablist.getTabListEntry(name);
@@ -270,15 +274,6 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 							}, 1L);
 						} else {
 							entryByUUID.properties = properties;
-							packetWrapper.write(Type.VAR_INT, entityId);
-							packetWrapper.write(Type.UUID, uuid);
-							packetWrapper.write(Type.INT, x);
-							packetWrapper.write(Type.INT, y);
-							packetWrapper.write(Type.INT, z);
-							packetWrapper.write(Type.BYTE, yaw);
-							packetWrapper.write(Type.BYTE, pitch);
-							packetWrapper.write(Type.SHORT, item);
-							packetWrapper.write(Types1_8.METADATA_LIST, metadata);
 						}
 					}
 				});

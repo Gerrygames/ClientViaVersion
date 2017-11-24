@@ -8,9 +8,12 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_12to1_11_1.ChatItemRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.Protocol1_9TO1_8;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.EntityTracker;
+import us.myles.viaversion.libs.gson.JsonElement;
+import us.myles.viaversion.libs.gson.JsonParser;
 
 public class ProtocolPatcher {
 	public static void patch() {
@@ -32,6 +35,22 @@ public class ProtocolPatcher {
 			}
 		});
 
+		ProtocolRegistry.getProtocolPath(335, 316).get(0).getValue().registerOutgoing(State.PLAY, 15, 15, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				this.handler(new PacketHandler() {
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						try {
+							JsonElement obj = new JsonParser().parse(packetWrapper.read(Type.STRING));
+							ChatItemRewriter.toClient(obj, packetWrapper.user());
+							packetWrapper.write(Type.STRING, obj.toString());
+						} catch (Exception ex) {ex.printStackTrace();}
+					}
+				});
+				this.map(Type.BYTE);
+			}
+		});
+
 		ProtocolRegistry.getProtocolPath(107, 47).get(0).getValue().registerIncoming(State.PLAY, 15, 5, new PacketRemapper() {
 			@Override
 			public void registerMap() {
@@ -41,9 +60,7 @@ public class ProtocolPatcher {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						int windowId = packetWrapper.get(Type.BYTE, 0);
 						int action = packetWrapper.get(Type.SHORT, 0);
-						boolean accepted = packetWrapper.get(Type.BOOLEAN, 0);
 						if (action==-89) packetWrapper.cancel(); //pls dont break anything  //Timolia.de kicks you for this response??!
 					}
 				});

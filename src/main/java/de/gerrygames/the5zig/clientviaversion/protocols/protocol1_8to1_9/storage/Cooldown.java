@@ -7,6 +7,7 @@ import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.exception.CancelException;
 
 import java.util.ArrayList;
 
@@ -28,7 +29,11 @@ public class Cooldown extends StoredObject {
 					hide.write(Type.VAR_INT, 3);
 					try {
 						hide.send(Protocol1_8TO1_9.class, true, false);
-					} catch (Exception ex) {ex.printStackTrace();}
+					} catch (CancelException ignored) {
+						;
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
 					return;
 				}
 				PacketWrapper time = new PacketWrapper(0x45, null, getUser());
@@ -43,10 +48,26 @@ public class Cooldown extends StoredObject {
 				subtitle.write(Type.VAR_INT, 1);
 				subtitle.write(Type.STRING, getTitle());
 				try {
-					time.send(Protocol1_8TO1_9.class, true, false);
-					title.send(Protocol1_8TO1_9.class, true, false);
-					subtitle.send(Protocol1_8TO1_9.class, true, false);
-				} catch (Exception ex) {ex.printStackTrace();}
+					title.send(Protocol1_8TO1_9.class, true, true);
+				} catch (CancelException ignored) {
+					;
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+				try {
+					subtitle.send(Protocol1_8TO1_9.class, true, true);
+				} catch (CancelException ignored) {
+					;
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+				try {
+					time.send(Protocol1_8TO1_9.class, true, true);
+				} catch (CancelException ignored) {
+					;
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
 			}
 		}, 1L);
 	}

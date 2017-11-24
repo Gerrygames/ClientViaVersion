@@ -102,7 +102,11 @@ public class ViaTransformerOut extends MessageToByteEncoder<ByteBuf> {
 		ByteBuf buf = null;
 		try {
 				ByteBuf cast = (ByteBuf) msg;
-				buf = this.allocateBuffer(ctx, cast, true);
+				if (ClientViaVersion.CLIENT_PROTOCOL_VERSION<=5) {
+					buf = ctx.alloc().ioBuffer();
+				} else {
+					buf = this.allocateBuffer(ctx, cast, true);
+				}
 
 				try {
 					this.encode(ctx, cast, buf);

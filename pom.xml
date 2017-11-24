@@ -189,6 +189,15 @@
                             <outputDirectory>C:\Users\Gero\AppData\Roaming\.minecraft1.8.9\the5zigmod\plugins</outputDirectory>
                             <destFileName>ClientViaVersion.jar</destFileName>
                         </artifactItem>
+                        <artifactItem>
+                            <groupId>de.gerrygames</groupId>
+                            <artifactId>ClientViaVersion</artifactId>
+                            <version>${project.version}</version>
+                            <type>jar</type>
+                            <overWrite>true</overWrite>
+                            <outputDirectory>C:\Users\Gero\AppData\Roaming\.minecraft1.fucking7\the5zigmod\plugins</outputDirectory>
+                            <destFileName>ClientViaVersion.jar</destFileName>
+                        </artifactItem>
                     </artifactItems>
                 </configuration>
             </plugin>

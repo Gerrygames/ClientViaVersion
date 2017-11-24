@@ -40,11 +40,6 @@ public class Protocol1_8TO1_9 extends Protocol {
 			return (int)(inputValue * 32.0D);
 		}
 	};
-	public static final ValueTransformer<Short, Byte> toOldByte = new ValueTransformer<Short, Byte>(Type.BYTE) {
-		public Byte transform(PacketWrapper wrapper, Short inputValue) {
-			return (byte)(inputValue / 128);
-		}
-	};
 	public static final ValueTransformer<Float, Byte> degreesToAngle = new ValueTransformer<Float, Byte>(Type.BYTE) {
 		@Override
 		public Byte transform(PacketWrapper packetWrapper, Float degrees) throws Exception {
@@ -95,6 +90,10 @@ public class Protocol1_8TO1_9 extends Protocol {
 					public void handle(final PacketWrapper packetWrapper) throws Exception {
 						final int entityID = packetWrapper.get(Type.VAR_INT, 0);
 						final int typeID = packetWrapper.get(Type.BYTE, 0);
+						if (typeID==3 || typeID==67 || typeID==91 || typeID==92 || typeID==93) {
+							packetWrapper.cancel();
+							return;
+						}
 						final EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 						final Entity1_10Types.EntityType type = Entity1_10Types.getTypeFromId(typeID, true);
 						tracker.getClientEntityTypes().put(entityID, type);
@@ -165,6 +164,10 @@ public class Protocol1_8TO1_9 extends Protocol {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						int entityID = packetWrapper.get(Type.VAR_INT, 0);
 						int typeID = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
+						if (typeID==69) {
+							packetWrapper.cancel();
+							return;
+						}
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 						tracker.getClientEntityTypes().put(entityID, Entity1_10Types.getTypeFromId(typeID, false));
 						tracker.sendMetadataBuffer(entityID);
@@ -192,7 +195,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 				map(Type.UUID, Type.NOTHING);
 				map(Type.STRING);
 				map(Type.POSITION);
-				map(Type.BYTE);
+				map(Type.BYTE, Type.UNSIGNED_BYTE);
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
@@ -311,7 +314,22 @@ public class Protocol1_8TO1_9 extends Protocol {
 
 		this.registerOutgoing(State.PLAY, 0x12, 0x2E);
 
-		this.registerOutgoing(State.PLAY, 0x13, 0x2D);  //Open Window
+		this.registerOutgoing(State.PLAY, 0x13, 0x2D, new PacketRemapper() {  //Open Window
+			@Override
+			public void registerMap() {
+				map(Type.UNSIGNED_BYTE);
+				map(Type.STRING);
+				map(Type.STRING);
+				map(Type.UNSIGNED_BYTE);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						String type = packetWrapper.get(Type.STRING, 0);
+						if (type.equals("EntityHorse")) packetWrapper.passthrough(Type.INT);
+					}
+				});
+			}
+		});
 
 		this.registerOutgoing(State.PLAY, 0x14, 0x30, new PacketRemapper() {  //Window Items
 			@Override
@@ -320,9 +338,15 @@ public class Protocol1_8TO1_9 extends Protocol {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
+						short windowId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
 						Item[] items = packetWrapper.read(Type.ITEM_ARRAY);
 						for (int i = 0; i<items.length; i++) {
 							items[i] = ItemRewriter.toClient(items[i]);
+						}
+						if (windowId==0 && items.length==46) {
+							Item[] old = items;
+							items = new Item[45];
+							System.arraycopy(old, 0, items, 0, 45);
 						}
 						packetWrapper.write(Type.ITEM_ARRAY, items);
 					}
@@ -342,6 +366,9 @@ public class Protocol1_8TO1_9 extends Protocol {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						packetWrapper.set(Type.ITEM, 0, ItemRewriter.toClient(packetWrapper.get(Type.ITEM, 0)));
+						byte windowId = packetWrapper.get(Type.BYTE, 0);
+						short slot = packetWrapper.get(Type.SHORT, 0);
+						if (windowId==0 && slot==45) packetWrapper.cancel();
 					}
 				});
 			}
@@ -524,10 +551,37 @@ public class Protocol1_8TO1_9 extends Protocol {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
-				map(Type.SHORT, toOldByte);
-				map(Type.SHORT, toOldByte);
-				map(Type.SHORT, toOldByte);
-				map(Type.BOOLEAN);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						//devide into two packets because Short.MAX_VALUE / 128 = 2 * Byte.MAX_VALUE
+						short relX = packetWrapper.read(Type.SHORT);
+						short relY = packetWrapper.read(Type.SHORT);
+						short relZ = packetWrapper.read(Type.SHORT);
+
+						byte relX1 = (byte)(relX / 256);
+						byte relX2 = (byte)((relX - relX1 * 128) / 128);
+						byte relY1 = (byte)(relY / 256);
+						byte relY2 = (byte)((relY - relY1 * 128) / 128);
+						byte relZ1 = (byte)(relZ / 256);
+						byte relZ2 = (byte)((relZ - relZ1 * 128) / 128);
+
+						packetWrapper.write(Type.BYTE, relX1);
+						packetWrapper.write(Type.BYTE, relY1);
+						packetWrapper.write(Type.BYTE, relZ1);
+
+						boolean onGround = packetWrapper.passthrough(Type.BOOLEAN);
+
+						PacketWrapper secondPacket = new PacketWrapper(0x15, null, packetWrapper.user());
+						secondPacket.write(Type.VAR_INT, packetWrapper.get(Type.VAR_INT, 0));
+						secondPacket.write(Type.BYTE, relX2);
+						secondPacket.write(Type.BYTE, relY2);
+						secondPacket.write(Type.BYTE, relZ2);
+						secondPacket.write(Type.BOOLEAN, onGround);
+
+						secondPacket.send(Protocol1_8TO1_9.class);
+					}
+				});
 			}
 		});
 
@@ -535,12 +589,41 @@ public class Protocol1_8TO1_9 extends Protocol {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
-				map(Type.SHORT, toOldByte);
-				map(Type.SHORT, toOldByte);
-				map(Type.SHORT, toOldByte);
-				map(Type.BYTE);
-				map(Type.BYTE);
-				map(Type.BOOLEAN);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						//devide into two packets because Short.MAX_VALUE / 128 = 2 * Byte.MAX_VALUE
+						short relX = packetWrapper.read(Type.SHORT);
+						short relY = packetWrapper.read(Type.SHORT);
+						short relZ = packetWrapper.read(Type.SHORT);
+
+						byte relX1 = (byte)(relX / 256);
+						byte relX2 = (byte)((relX - relX1 * 128) / 128);
+						byte relY1 = (byte)(relY / 256);
+						byte relY2 = (byte)((relY - relY1 * 128) / 128);
+						byte relZ1 = (byte)(relZ / 256);
+						byte relZ2 = (byte)((relZ - relZ1 * 128) / 128);
+
+						packetWrapper.write(Type.BYTE, relX1);
+						packetWrapper.write(Type.BYTE, relY1);
+						packetWrapper.write(Type.BYTE, relZ1);
+
+						byte yaw = packetWrapper.passthrough(Type.BYTE);
+						byte pitch = packetWrapper.passthrough(Type.BYTE);
+						boolean onGround = packetWrapper.passthrough(Type.BOOLEAN);
+
+						PacketWrapper secondPacket = new PacketWrapper(0x17, null, packetWrapper.user());
+						secondPacket.write(Type.VAR_INT, packetWrapper.get(Type.VAR_INT, 0));
+						secondPacket.write(Type.BYTE, relX2);
+						secondPacket.write(Type.BYTE, relY2);
+						secondPacket.write(Type.BYTE, relZ2);
+						secondPacket.write(Type.BYTE, yaw);
+						secondPacket.write(Type.BYTE, pitch);
+						secondPacket.write(Type.BOOLEAN, onGround);
+
+						secondPacket.send(Protocol1_8TO1_9.class);
+					}
+				});
 			}
 		});
 
@@ -903,7 +986,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 						int removed = 0;
 						for (int i = 0; i<size; i++) {
 							String key = packetWrapper.read(Type.STRING);
-							boolean skip = key.equals("generic.armor") || key.equals("generic.attackSpeed");
+							boolean skip = key.equals("generic.armor") || key.equals("generic.attackSpeed") || key.equals("generic.luck") || key.equals("generic.armorToughness");
 							double value = packetWrapper.read(Type.DOUBLE);
 							int modifiersize = packetWrapper.read(Type.VAR_INT);
 							if (!skip) {
@@ -1073,7 +1156,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 		this.registerIncoming(State.PLAY, 0x13, 0x07, new PacketRemapper() {  //Player Digging
 			@Override
 			public void registerMap() {
-				map(Type.BYTE);
+				map(Type.BYTE, Type.VAR_INT);
 				map(Type.POSITION);
 				map(Type.BYTE);
 				handler(new PacketHandler() {

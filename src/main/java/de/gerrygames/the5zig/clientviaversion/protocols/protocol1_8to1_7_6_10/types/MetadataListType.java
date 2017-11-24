@@ -39,6 +39,9 @@ public class MetadataListType extends MetaListTypeTemplate {
 		for (Metadata meta : metadata) {
 			Types1_7_6_10.METADATA.write(buffer, meta);
 		}
+		if (metadata.isEmpty()) {
+			Types1_7_6_10.METADATA.write(buffer, new Metadata(0, MetaType1_7_6_10.Byte, (byte)0));
+		}
 		buffer.writeByte(127);
 	}
 }

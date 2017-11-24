@@ -70,7 +70,7 @@ public class Chunk1_8to1_7_6_10 {
 	}
 
 	public byte[] get1_8Data() {
-		int finalsize = 0;
+		int finalSize = 0;
 		int columns = Integer.bitCount(this.primaryBitMask);
 		byte[] buffer = new byte[columns * 10240 + (this.skyLight ? columns * 2048 : 0) + 256];
 
@@ -89,8 +89,8 @@ public class Chunk1_8to1_7_6_10 {
 					data = SpigotDebreakifier.getCorrectedData(id, data);
 
 					char val = (char) (id << 4 | data);
-					buffer[finalsize++] = (byte) (val & 255);
-					buffer[finalsize++] = (byte) (val >> 8 & 255);
+					buffer[finalSize++] = (byte) (val & 255);
+					buffer[finalSize++] = (byte) (val >> 8 & 255);
 				}
 			}
 		}
@@ -98,8 +98,8 @@ public class Chunk1_8to1_7_6_10 {
 		for (int i = 0; i < storageArrays.length; ++i) {
 			if (storageArrays[i] != null && (this.primaryBitMask & 1 << i) != 0 && (!this.groundUp || storageArrays[i].isEmpty())) {
 				NibbleArray nibblearray = storageArrays[i].getBlocklightArray();
-				System.arraycopy(nibblearray.getHandle(), 0, buffer, finalsize, nibblearray.getHandle().length);
-				finalsize += nibblearray.getHandle().length;
+				System.arraycopy(nibblearray.getHandle(), 0, buffer, finalSize, nibblearray.getHandle().length);
+				finalSize += nibblearray.getHandle().length;
 			}
 		}
 
@@ -107,19 +107,19 @@ public class Chunk1_8to1_7_6_10 {
 			for (int i = 0; i < storageArrays.length; ++i) {
 				if (storageArrays[i] != null && (this.primaryBitMask & 1 << i) != 0 && (!this.groundUp || storageArrays[i].isEmpty())) {
 					NibbleArray nibblearray = storageArrays[i].getSkylightArray();
-					System.arraycopy(nibblearray.getHandle(), 0, buffer, finalsize, nibblearray.getHandle().length);
-					finalsize += nibblearray.getHandle().length;
+					System.arraycopy(nibblearray.getHandle(), 0, buffer, finalSize, nibblearray.getHandle().length);
+					finalSize += nibblearray.getHandle().length;
 				}
 			}
 		}
 
 		if (this.groundUp) {
-			System.arraycopy(blockBiomeArray, 0, buffer, finalsize, blockBiomeArray.length);
-			finalsize += blockBiomeArray.length;
+			System.arraycopy(blockBiomeArray, 0, buffer, finalSize, blockBiomeArray.length);
+			finalSize += blockBiomeArray.length;
 		}
 
-		byte[] finaldata = new byte[finalsize];
-		System.arraycopy(buffer, 0, finaldata, 0, finalsize);
+		byte[] finaldata = new byte[finalSize];
+		System.arraycopy(buffer, 0, finaldata, 0, finalSize);
 
 		return finaldata;
 	}
