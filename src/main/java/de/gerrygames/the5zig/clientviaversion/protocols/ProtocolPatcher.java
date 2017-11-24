@@ -61,7 +61,7 @@ public class ProtocolPatcher {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						int action = packetWrapper.get(Type.SHORT, 0);
-						if (action==-89) packetWrapper.cancel(); //pls dont break anything  //Timolia.de kicks you for this response??!
+						if (action==-89) packetWrapper.cancel();
 					}
 				});
 			}

@@ -1,5 +1,7 @@
 package de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.storage;
 
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 
@@ -58,8 +60,8 @@ public class GameProfileStorage extends StoredObject {
 		}
 
 		public static String fixDisplayName(String displayName) {
-			if (displayName!=null && displayName.startsWith("{\"text\":")) {
-				displayName = displayName.substring(displayName.indexOf(":")+2, displayName.length()-2);
+			if (displayName!=null && displayName.startsWith("{")) {
+				displayName = TextComponent.toLegacyText(ComponentSerializer.parse(displayName));
 			}
 			return displayName;
 		}

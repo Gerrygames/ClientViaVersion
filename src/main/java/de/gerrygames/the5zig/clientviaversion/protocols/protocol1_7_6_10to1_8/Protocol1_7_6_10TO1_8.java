@@ -9,7 +9,6 @@ import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.pr
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.storage.EntityTracker;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.storage.PlayerPosition;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.storage.GameProfileStorage;
-import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.chat.ChatComponent;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.storage.Windows;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.types.CustomIntType;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.types.CustomStringType;
@@ -17,6 +16,9 @@ import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.ty
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_9.chunks.BlockStorage;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -35,7 +37,6 @@ import us.myles.ViaVersion.api.type.types.version.Types1_8;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
-import us.myles.ViaVersion.util.GsonUtil;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -165,7 +166,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						if ((flags & 0x02) == 0x02) {
 							y += playerPosition.getPosY();
 						}
-						y += 1.7;
+						y += 1.62;
 						packetWrapper.set(Type.DOUBLE, 1, y);
 						if ((flags & 0x04) == 0x04) {
 							double z = packetWrapper.get(Type.DOUBLE, 2);
@@ -187,7 +188,8 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 				create(new ValueCreator() {
 					@Override
 					public void write(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.write(Type.BOOLEAN, packetWrapper.user().get(PlayerPosition.class).isOnGround());
+						//packetWrapper.write(Type.BOOLEAN, packetWrapper.user().get(PlayerPosition.class).isOnGround());
+						packetWrapper.write(Type.BOOLEAN, true);
 					}
 				});
 			}
@@ -959,6 +961,15 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 			}
 		});
 
+		this.registerOutgoing(State.PLAY, 0x32, 0x32, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.BYTE);
+				map(Type.SHORT);
+				map(Type.BOOLEAN);
+			}
+		});
+
 		//Update Sign
 		this.registerOutgoing(State.PLAY, 0x33, 0x33, new PacketRemapper() {
 			@Override
@@ -975,10 +986,17 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.write(Type.STRING, GsonUtil.getGson().fromJson(packetWrapper.read(Type.STRING), ChatComponent.class).text);
-						packetWrapper.write(Type.STRING, GsonUtil.getGson().fromJson(packetWrapper.read(Type.STRING), ChatComponent.class).text);
-						packetWrapper.write(Type.STRING, GsonUtil.getGson().fromJson(packetWrapper.read(Type.STRING), ChatComponent.class).text);
-						packetWrapper.write(Type.STRING, GsonUtil.getGson().fromJson(packetWrapper.read(Type.STRING), ChatComponent.class).text);
+						for (int i = 0; i<4; i++) {
+							String line = packetWrapper.read(Type.STRING);
+							if (line.startsWith("{")) {
+								line = TextComponent.toLegacyText(ComponentSerializer.parse(line));
+							}
+							if (line.length()>15) {
+								line = ChatColor.stripColor(line);
+								if (line.length()>15) line = line.substring(0, 15);
+							}
+							packetWrapper.write(Type.STRING, line);
+						}
 					}
 				});
 			}
@@ -1276,22 +1294,6 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						byte[] data = packetWrapper.read(Type.REMAINING_BYTES);
 						packetWrapper.write(Type.SHORT, (short)data.length);
 						packetWrapper.write(Type.REMAINING_BYTES, data);
-						/*if (channel.equals("MC|Brand")) {
-							byte[] data = new byte[length];
-							for (int i = 0; i<length; i++) {
-								data[i] = packetWrapper.read(Type.BYTE);
-							}
-							String brand = new String(data, "UTF-8");
-							ByteBuf buf = Unpooled.buffer();
-							Type.STRING.write(buf, brand);
-							while (buf.readableBytes()>0) packetWrapper.write(Type.BYTE, buf.readByte());
-							buf.release();
-						} else {
-							for (int i = 0; i<length; i++) {
-								packetWrapper.write(Type.BYTE, packetWrapper.read(Type.BYTE));
-							}
-							if (channel.equals("MC|AdvCdm")) packetWrapper.write(Type.BYTE, (byte)1);
-						}*/
 					}
 				});
 			}
@@ -1441,6 +1443,21 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 			public void registerMap() {
 				map(Type.INT, Type.VAR_INT);
 				map(Type.BYTE, Type.VAR_INT);
+			}
+		});
+
+		//Player
+		this.registerIncoming(State.PLAY, 0x03, 0x03, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.BOOLEAN);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						PlayerPosition playerPosition = packetWrapper.user().get(PlayerPosition.class);
+						playerPosition.setOnGround(packetWrapper.get(Type.BOOLEAN, 0));
+					}
+				});
 			}
 		});
 
@@ -1645,6 +1662,23 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						Item item = packetWrapper.get(Type.ITEM, 0);
 						ItemRewriter.toServer(item);
 						packetWrapper.set(Type.ITEM, 0, item);
+					}
+				});
+			}
+		});
+
+		//Confirm Transaction
+		this.registerIncoming(State.PLAY, 0x0F, 0x0F, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.BYTE);
+				map(Type.SHORT);
+				map(Type.BOOLEAN);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						int action = packetWrapper.get(Type.SHORT, 0);
+						if (action==-89) packetWrapper.cancel();
 					}
 				});
 			}
