@@ -15,8 +15,6 @@ import eu.the5zig.util.minecraft.ChatColor;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.storage.Scoreboard;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
