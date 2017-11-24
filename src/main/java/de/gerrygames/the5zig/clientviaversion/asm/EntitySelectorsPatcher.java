@@ -1,7 +1,7 @@
 package de.gerrygames.the5zig.clientviaversion.asm;
 
 import eu.the5zig.mod.asm.Transformer;
-import de.gerrygames.the5zig.clientviaversion.utils.ClassNameUtils;
+import de.gerrygames.the5zig.clientviaversion.classnames.ClassNames;
 import net.minecraft.launchwrapper.IClassTransformer;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
@@ -13,8 +13,8 @@ import org.objectweb.asm.Opcodes;
 import static org.objectweb.asm.Opcodes.*;
 
 public class EntitySelectorsPatcher implements IClassTransformer {
-	private static String entitySelectorsClassName = ClassNameUtils.getEntitySelectorsClassName();
-	private static String applyDescriptor = (Transformer.FORGE ? "apply" : "a") + "(L" + ClassNameUtils.getEntityClass().getName().replace(".", "/") + ";)Z";
+	private static String entitySelectorsClassName = ClassNames.getEntitySelectorsClassName();
+	private static String applyDescriptor = (Transformer.FORGE ? "apply" : "a") + "(L" + ClassNames.getEntityClass().getName().replace(".", "/") + ";)Z";
 
 	@Override
 	public byte[] transform(String s, String s1, byte[] bytes) {
@@ -38,9 +38,9 @@ public class EntitySelectorsPatcher implements IClassTransformer {
 			mv.visitTryCatchBlock(l0, l1, l2, "java/lang/Exception");
 			mv.visitLabel(l0);
 			mv.visitLineNumber(12, l0);
-			mv.visitLdcInsn(ClassNameUtils.getNetworkManagerClass().getName());
+			mv.visitLdcInsn(ClassNames.getNetworkManagerClass().getName());
 			mv.visitMethodInsn(INVOKESTATIC, "java/lang/Class", "forName", "(Ljava/lang/String;)Ljava/lang/Class;", false);
-			mv.visitLdcInsn(ClassNameUtils.getNetworkManagerLoggerField().getName());
+			mv.visitLdcInsn(ClassNames.getNetworkManagerLoggerField().getName());
 			mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getDeclaredField", "(Ljava/lang/String;)Ljava/lang/reflect/Field;", false);
 			mv.visitVarInsn(ASTORE, 2);
 			Label l3 = new Label();

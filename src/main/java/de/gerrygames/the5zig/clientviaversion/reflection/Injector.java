@@ -9,7 +9,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.socket.SocketChannel;
-import de.gerrygames.the5zig.clientviaversion.utils.ClassNameUtils;
+import de.gerrygames.the5zig.clientviaversion.classnames.ClassNames;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -39,7 +39,7 @@ public class Injector {
 	}
 
 	public static void injectListener() throws NoSuchFieldException, IllegalAccessException {
-		Field logger = ClassNameUtils.getNetworkManagerLoggerField();
+		Field logger = ClassNames.getNetworkManagerLoggerField();
 		logger.setAccessible(true);
 		Field modifiers = Field.class.getDeclaredField("modifiers");
 		modifiers.setAccessible(true);
@@ -48,9 +48,9 @@ public class Injector {
 		Logger oldlogger = (Logger) logger.get(null);
 
 		logger.set(null, new SimpleLogger(oldlogger.getName(), Level.OFF, false, false, false, false, "", oldlogger.getMessageFactory(), PropertiesUtil.getProperties(), System.out) {
-			private final Class networkmanagerclass = ClassNameUtils.getNetworkManagerClass();
-			private final Class nethandlerloginclass = ClassNameUtils.getNetHanderLoginClientClass();
-			private final Class inethandlerstatusclass = ClassNameUtils.getINetHanderStatusClientClass();
+			private final Class networkmanagerclass = ClassNames.getNetworkManagerClass();
+			private final Class nethandlerloginclass = ClassNames.getNetHanderLoginClientClass();
+			private final Class inethandlerstatusclass = ClassNames.getINetHanderStatusClientClass();
 
 			@Override
 			public void debug(String message, Object... params) {
@@ -86,7 +86,7 @@ public class Injector {
 		if (ClientViaVersion.CLIENT_PROTOCOL_VERSION ==ClientViaVersion.spoofedVersion) return;
 		ClientViaVersion.networkManager = networkManager;
 		try {
-			Field channelf = ClassNameUtils.getNetworkManagerChannelField();
+			Field channelf = ClassNames.getNetworkManagerChannelField();
 			channelf.setAccessible(true);
 			Channel channel = (Channel)channelf.get(networkManager);
 			if (channel==null) throw new NullPointerException("Channel is null?");
@@ -137,7 +137,7 @@ public class Injector {
 			channel.pipeline().addBefore("encoder", "viatransformerout", new ViaTransformerOut());
 			Via.getManager().addPortedClient(user);
 		} catch (Exception ex) {
-			The5zigMod.logger.error("[ClientViaVersion] Could not inject ViaVersion into pipeline.");
+			ClientViaVersion.LOGGER.error("[ClientViaVersion] Could not inject ViaVersion into pipeline.");
 			ex.printStackTrace();
 		}
 	}

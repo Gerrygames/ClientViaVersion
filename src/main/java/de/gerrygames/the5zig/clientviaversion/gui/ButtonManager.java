@@ -1,6 +1,6 @@
 package de.gerrygames.the5zig.clientviaversion.gui;
 
-import de.gerrygames.the5zig.clientviaversion.utils.ClassNameUtils;
+import de.gerrygames.the5zig.clientviaversion.classnames.ClassNames;
 import eu.the5zig.mod.The5zigMod;
 import eu.the5zig.mod.asm.Transformer;
 import org.lwjgl.input.Mouse;
@@ -29,10 +29,10 @@ public class ButtonManager {
 
 		if (method!=null) {
 			try {
-				int width = (int) ClassNameUtils.getGuiScreenWidthField().get(GuiPatcher.prevScreen);
-				int height = (int) ClassNameUtils.getGuiScreenHeightField().get(GuiPatcher.prevScreen);
-				int displayWidth = (int) ClassNameUtils.getMinecraftDisplayWidthField().get(Class.forName("Variables").getMethod("getMinecraft").invoke(The5zigMod.getVars()));
-				int displayHeight = (int) ClassNameUtils.getMinecraftDisplayHeightField().get(Class.forName("Variables").getMethod("getMinecraft").invoke(The5zigMod.getVars()));
+				int width = (int) ClassNames.getGuiScreenWidthField().get(GuiPatcher.prevScreen);
+				int height = (int) ClassNames.getGuiScreenHeightField().get(GuiPatcher.prevScreen);
+				int displayWidth = (int) ClassNames.getMinecraftDisplayWidthField().get(Class.forName("Variables").getMethod("getMinecraft").invoke(The5zigMod.getVars()));
+				int displayHeight = (int) ClassNames.getMinecraftDisplayHeightField().get(Class.forName("Variables").getMethod("getMinecraft").invoke(The5zigMod.getVars()));
 
 				int x = Mouse.getX() * width / displayWidth;
 				int y = height - Mouse.getY() * height / displayHeight;

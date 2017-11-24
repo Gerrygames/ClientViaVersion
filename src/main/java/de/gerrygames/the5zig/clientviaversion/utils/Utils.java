@@ -1,5 +1,6 @@
 package de.gerrygames.the5zig.clientviaversion.utils;
 
+import de.gerrygames.the5zig.clientviaversion.classnames.ClassNames;
 import eu.the5zig.mod.The5zigMod;
 import eu.the5zig.mod.gui.ingame.ItemStack;
 import eu.the5zig.mod.manager.AutoReconnectManager;
@@ -28,7 +29,7 @@ public class Utils {
 	public static Item nmsItemStackToItem(Object itemStack) {
 		if (itemStack==null) return airItem();
 		try {
-			int id = (int) ClassNameUtils.getItemGetIdFromItemMethod().invoke(null, ClassNameUtils.getItemStackItemField().get(itemStack));
+			int id = (int) ClassNames.getItemGetIdFromItemMethod().invoke(null, ClassNames.getItemStackItemField().get(itemStack));
 			return new Item((short)id, (byte)1, (short)0, null);  //TODO
 		} catch (Exception ex) {ex.printStackTrace();}
 		return airItem();
@@ -40,7 +41,7 @@ public class Utils {
 
 	public static State getConnectionState(Channel channel) {
 		try {
-			Enum state = (Enum) channel.attr((AttributeKey) ClassNameUtils.getNetworkManagerConnectionStateField().get(null)).get();
+			Enum state = (Enum) channel.attr((AttributeKey) ClassNames.getNetworkManagerConnectionStateField().get(null)).get();
 
 			State viaState = State.PLAY;
 			switch (state.ordinal()) {
@@ -81,7 +82,7 @@ public class Utils {
 	public static int getPlayerEntityId() {
 		try {
 			Object player = Class.forName("Variables").getMethod("getPlayer").invoke(The5zigMod.getVars());
-			return (int) ClassNameUtils.getEntityEntityIdField().get(player);
+			return (int) ClassNames.getEntityEntityIdField().get(player);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

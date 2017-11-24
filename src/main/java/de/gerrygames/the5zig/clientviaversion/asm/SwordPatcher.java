@@ -3,7 +3,7 @@ package de.gerrygames.the5zig.clientviaversion.asm;
 import de.gerrygames.the5zig.clientviaversion.main.ClientViaVersion;
 import eu.the5zig.mod.The5zigMod;
 import eu.the5zig.mod.asm.Transformer;
-import de.gerrygames.the5zig.clientviaversion.utils.ClassNameUtils;
+import de.gerrygames.the5zig.clientviaversion.classnames.ClassNames;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
@@ -27,14 +27,14 @@ public class SwordPatcher {
 		try {
 			loadClass(dumpCustomSwordBlockingClass(), "CustomSwordBlocking");
 			Class customSwordClass = loadClass(dumpCustomSwordClass(), "CustomSword");
-			Class toolMaterialClass = Class.forName(ClassNameUtils.getItemClass().getName() + "$" + ClassNameUtils.getToolMaterialClassName());
+			Class toolMaterialClass = Class.forName(ClassNames.getItemClass().getName() + "$" + ClassNames.getToolMaterialClassName());
 			Constructor customSwordConstructor = customSwordClass.getConstructor(toolMaterialClass);
 
-			Method getItemByName = ClassNameUtils.getItemGetItemByNameMethod();
-			Method setItemName = ClassNameUtils.getItemSetNameMethod();
-			Class itemStackClass = ClassNameUtils.getItemStackClass();
+			Method getItemByName = ClassNames.getItemGetItemByNameMethod();
+			Method setItemName = ClassNames.getItemSetNameMethod();
+			Class itemStackClass = ClassNames.getItemStackClass();
 
-			Field toolMaterialField = ClassNameUtils.getItemSwordToolMaterialField();
+			Field toolMaterialField = ClassNames.getItemSwordToolMaterialField();
 			toolMaterialField.setAccessible(true);
 
 			{
@@ -82,19 +82,19 @@ public class SwordPatcher {
 				//Update SearchTrees
 				Object mc = Class.forName("Variables").getMethod("getMinecraft").invoke(The5zigMod.getVars());
 
-				Method m = ClassNameUtils.getMinecraftPopulateSearchTreeManagerMethod();
+				Method m = ClassNames.getMinecraftPopulateSearchTreeManagerMethod();
 				m.setAccessible(true);
 				m.invoke(mc);
 
-				Field field = ClassNameUtils.getMinecraftSearchTreeManagerField();
+				Field field = ClassNames.getMinecraftSearchTreeManagerField();
 				field.setAccessible(true);
 				Object searchTreeManager = field.get(mc);
-				field = searchTreeManager.getClass().getDeclaredField(ClassNameUtils.getSearchTreeManagerTreesFieldName());
+				field = searchTreeManager.getClass().getDeclaredField(ClassNames.getSearchTreeManagerTreesFieldName());
 				field.setAccessible(true);
 
 				for (Object searchTree : ((Map)field.get(searchTreeManager)).values()) {
 					try {
-						Method recalculate = searchTree.getClass().getDeclaredMethod(ClassNameUtils.getSearchTreeRecalculateMethodName());
+						Method recalculate = searchTree.getClass().getDeclaredMethod(ClassNames.getSearchTreeRecalculateMethodName());
 						recalculate.invoke(searchTree);
 					} catch (Exception ignored) {}
 				}
@@ -104,7 +104,7 @@ public class SwordPatcher {
 
 	private static void registerItem(int id, String name, Object item, Object olditem) throws Exception {
 		if (Transformer.FORGE) {
-			Field field = ClassNameUtils.getItemRegistryField();
+			Field field = ClassNames.getItemRegistryField();
 			field.setAccessible(true);
 			Object registry = field.get(null);
 			field = registry.getClass().getDeclaredField("delegate");
@@ -115,30 +115,30 @@ public class SwordPatcher {
 			isFrozen.setAccessible(true);
 			isFrozen.set(delegate, false);
 
-			Method registerItem = delegate.getClass().getDeclaredMethod("add", int.class, ClassNameUtils.getIForgeRegistryEntryClass(), String.class);
+			Method registerItem = delegate.getClass().getDeclaredMethod("add", int.class, ClassNames.getIForgeRegistryEntryClass(), String.class);
 			registerItem.setAccessible(true);
 
-			Method setRegistryName = ClassNameUtils.getIForgeRegistryEntrySetRegistryName();
+			Method setRegistryName = ClassNames.getIForgeRegistryEntrySetRegistryName();
 			setRegistryName.invoke(item, Class.forName("ResourceLocation").getConstructor(String.class).newInstance(name));
 			registerItem.invoke(delegate, id, item, "ClientViaVersion");
 		} else {
-			Method registerItem = ClassNameUtils.getItemRegisterItemMethod();
+			Method registerItem = ClassNames.getItemRegisterItemMethod();
 			registerItem.setAccessible(true);
 			registerItem.invoke(null, id, name, item);
 
 			if (olditem==null) return;
 			//Replace old item in recipes
-			List recipeLists = (List) ClassNameUtils.getRecipeBookClientAllRecipesField().get(null);
+			List recipeLists = (List) ClassNames.getRecipeBookClientAllRecipesField().get(null);
 
 			for (Object recipeList : recipeLists) {
-				List recipes = (List) recipeList.getClass().getMethod(ClassNameUtils.getRecipeListGetRecipesMethodName()).invoke(recipeList);
+				List recipes = (List) recipeList.getClass().getMethod(ClassNames.getRecipeListGetRecipesMethodName()).invoke(recipeList);
 				for (Object recipe : recipes) {
 					try {
-						Field field = ClassNameUtils.getShapedRecipesRecipeOutputField();
+						Field field = ClassNames.getShapedRecipesRecipeOutputField();
 						field.setAccessible(true);
 
 						Object itemstack = field.get(recipe);
-						field = ClassNameUtils.getItemStackItemField();
+						field = ClassNames.getItemStackItemField();
 						field.setAccessible(true);
 						if (field.get(itemstack)==olditem) {
 							Field modifiers = Field.class.getDeclaredField("modifiers");
@@ -174,11 +174,11 @@ public class SwordPatcher {
 	}
 
 	private static byte[] dumpCustomSwordBlockingClass() throws Exception {
-		String itemPropertyGetterClass = ClassNameUtils.getItemPropertyGetterClass().getName().replace(".", "/");
-		String itemPropertyGetterApplyMethod = ClassNameUtils.getItemPropertyGetterApplyMethodName();
-		String itemStackClass = ClassNameUtils.getItemStackClass().getName().replace(".", "/");
-		String worldClass = ClassNameUtils.getWorldClientClass().getSuperclass().getName().replace(".", "/");
-		String entityLivingClass = ClassNameUtils.getEntityLivingClass().getName().replace(".", "/");
+		String itemPropertyGetterClass = ClassNames.getItemPropertyGetterClass().getName().replace(".", "/");
+		String itemPropertyGetterApplyMethod = ClassNames.getItemPropertyGetterApplyMethodName();
+		String itemStackClass = ClassNames.getItemStackClass().getName().replace(".", "/");
+		String worldClass = ClassNames.getWorldClientClass().getSuperclass().getName().replace(".", "/");
+		String entityLivingClass = ClassNames.getEntityLivingClass().getName().replace(".", "/");
 
 		ClassWriter cw = new ClassWriter(0);
 		FieldVisitor fv;
@@ -222,10 +222,10 @@ public class SwordPatcher {
 			Label l1 = new Label();
 			mv.visitJumpInsn(IFNULL, l1);
 			mv.visitVarInsn(ALOAD, 3);
-			mv.visitMethodInsn(INVOKEVIRTUAL, entityLivingClass, ClassNameUtils.getEntityLivingIsHandActiveMethod().getName(), "()Z", false);
+			mv.visitMethodInsn(INVOKEVIRTUAL, entityLivingClass, ClassNames.getEntityLivingIsHandActiveMethod().getName(), "()Z", false);
 			mv.visitJumpInsn(IFEQ, l1);
 			mv.visitVarInsn(ALOAD, 3);
-			mv.visitMethodInsn(INVOKEVIRTUAL, entityLivingClass, ClassNameUtils.getEntityLivingGetActiveItemStackMethod().getName(), "()L" + itemStackClass + ";", false);
+			mv.visitMethodInsn(INVOKEVIRTUAL, entityLivingClass, ClassNames.getEntityLivingGetActiveItemStackMethod().getName(), "()L" + itemStackClass + ";", false);
 			mv.visitVarInsn(ALOAD, 1);
 			mv.visitJumpInsn(IF_ACMPNE, l1);
 			mv.visitInsn(FCONST_1);
@@ -253,24 +253,24 @@ public class SwordPatcher {
 
 	private static byte[] dumpCustomSwordClass() throws Exception {
 
-		String itemClass = ClassNameUtils.getItemClass().getName().replace(".", "/");
-		String itemStackClass = ClassNameUtils.getItemStackClass().getName().replace(".", "/");
-		String swordClass = ClassNameUtils.getItemSwordClass().getName().replace(".", "/");
-		String enumAction = ClassNameUtils.getEnumActionClass().getName().replace(".", "/");
-		String toolMaterialClass = ClassNameUtils.getToolMaterialClassName().replace(".", "/");
-		String getEnumActionMethodName = ClassNameUtils.getItemSwordGetEnumActionMethodName();
-		String worldClass = ClassNameUtils.getWorldClientClass().getSuperclass().getName().replace(".", "/");
-		String playerClass = ClassNameUtils.getEntityPlayerClass().getName().replace(".", "/");
-		String enumHand = ClassNameUtils.getEnumHandClass().getName().replace(".", "/");
-		String actionResultClass = ClassNameUtils.getActionResultClass().getName().replace(".", "/");
-		String getHeldItemMethod = ClassNameUtils.getEntityPlayerGetHeldItemMethod().getName();
-		String setActiveHandMethod = ClassNameUtils.getEntityPlayerSetActiveHandMethod().getName();
-		String onItemRightClickMethod = ClassNameUtils.getItemOnItemRightClickMethod().getName();
-		String enumActionResult = ClassNameUtils.getEnumActionResultClass().getName().replace(".", "/");
-		String enumActionResultSuccess = ClassNameUtils.getEnumActionResultSuccessName();
+		String itemClass = ClassNames.getItemClass().getName().replace(".", "/");
+		String itemStackClass = ClassNames.getItemStackClass().getName().replace(".", "/");
+		String swordClass = ClassNames.getItemSwordClass().getName().replace(".", "/");
+		String enumAction = ClassNames.getEnumActionClass().getName().replace(".", "/");
+		String toolMaterialClass = ClassNames.getToolMaterialClassName().replace(".", "/");
+		String getEnumActionMethodName = ClassNames.getItemSwordGetEnumActionMethodName();
+		String worldClass = ClassNames.getWorldClientClass().getSuperclass().getName().replace(".", "/");
+		String playerClass = ClassNames.getEntityPlayerClass().getName().replace(".", "/");
+		String enumHand = ClassNames.getEnumHandClass().getName().replace(".", "/");
+		String actionResultClass = ClassNames.getActionResultClass().getName().replace(".", "/");
+		String getHeldItemMethod = ClassNames.getEntityPlayerGetHeldItemMethod().getName();
+		String setActiveHandMethod = ClassNames.getEntityPlayerSetActiveHandMethod().getName();
+		String onItemRightClickMethod = ClassNames.getItemOnItemRightClickMethod().getName();
+		String enumActionResult = ClassNames.getEnumActionResultClass().getName().replace(".", "/");
+		String enumActionResultSuccess = ClassNames.getEnumActionResultSuccessName();
 		String resourceClass = Class.forName("ResourceLocation").getSuperclass().getName().replace(".", "/");
-		String itemPropertyGetter = ClassNameUtils.getItemPropertyGetterClass().getName().replace(".", "/");
-		String addPropertyOverrided = ClassNameUtils.getItemAddPropertyOverrideMethodName();
+		String itemPropertyGetter = ClassNames.getItemPropertyGetterClass().getName().replace(".", "/");
+		String addPropertyOverrided = ClassNames.getItemAddPropertyOverrideMethodName();
 
 
 		ClassWriter cw = new ClassWriter(0);
@@ -325,9 +325,9 @@ public class SwordPatcher {
 			mv.visitTryCatchBlock(l0, l1, l2, "java/lang/Exception");
 			mv.visitLabel(l0);
 			mv.visitLineNumber(15, l0);
-			mv.visitLdcInsn(ClassNameUtils.getNetworkManagerClass().getName());
+			mv.visitLdcInsn(ClassNames.getNetworkManagerClass().getName());
 			mv.visitMethodInsn(INVOKESTATIC, "java/lang/Class", "forName", "(Ljava/lang/String;)Ljava/lang/Class;", false);
-			mv.visitLdcInsn(ClassNameUtils.getNetworkManagerLoggerField().getName());
+			mv.visitLdcInsn(ClassNames.getNetworkManagerLoggerField().getName());
 			mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getDeclaredField", "(Ljava/lang/String;)Ljava/lang/reflect/Field;", false);
 			mv.visitVarInsn(ASTORE, 2);
 			Label l3 = new Label();
@@ -395,9 +395,9 @@ public class SwordPatcher {
 			mv.visitTryCatchBlock(l0, l1, l2, "java/lang/Exception");
 			mv.visitLabel(l0);
 			mv.visitLineNumber(26, l0);
-			mv.visitLdcInsn(ClassNameUtils.getNetworkManagerClass().getName());
+			mv.visitLdcInsn(ClassNames.getNetworkManagerClass().getName());
 			mv.visitMethodInsn(INVOKESTATIC, "java/lang/Class", "forName", "(Ljava/lang/String;)Ljava/lang/Class;", false);
-			mv.visitLdcInsn(ClassNameUtils.getNetworkManagerLoggerField().getName());
+			mv.visitLdcInsn(ClassNames.getNetworkManagerLoggerField().getName());
 			mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getDeclaredField", "(Ljava/lang/String;)Ljava/lang/reflect/Field;", false);
 			mv.visitVarInsn(ASTORE, 4);
 			Label l3 = new Label();
@@ -484,7 +484,7 @@ public class SwordPatcher {
 			mv.visitEnd();
 		}
 		{
-			mv = cw.visitMethod(ACC_PUBLIC, ClassNameUtils.getItemSwordGetMaxItemUseDurationName(), "(L" + itemStackClass + ";)I", null, null);
+			mv = cw.visitMethod(ACC_PUBLIC, ClassNames.getItemSwordGetMaxItemUseDurationName(), "(L" + itemStackClass + ";)I", null, null);
 			mv.visitCode();
 			Label l0 = new Label();
 			mv.visitLabel(l0);

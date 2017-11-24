@@ -7,11 +7,12 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import de.gerrygames.the5zig.clientviaversion.main.ClientViaVersion;
-import de.gerrygames.the5zig.clientviaversion.utils.ClassNameUtils;
+import de.gerrygames.the5zig.clientviaversion.classnames.ClassNames;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.ProtocolPipeline;
 import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.api.type.types.version.Types1_12;
 import us.myles.ViaVersion.exception.CancelException;
 import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.packets.State;
@@ -53,8 +54,8 @@ public class ViaTransformerIn extends ByteToMessageDecoder {
 
 		if (state==State.LOGIN && packetId==0x03) {
 			int threshold = Type.VAR_INT.read(in);
-			ctx.pipeline().addBefore("viatransformerin", "decompress", (ChannelHandler) ClassNameUtils.getNettyCompressionDecoderClass().getConstructor(int.class).newInstance(threshold));
-			ctx.pipeline().addBefore("viatransformerout", "compress", (ChannelHandler) ClassNameUtils.getNettyCompressionEncoderClass().getConstructor(int.class).newInstance(threshold));
+			ctx.pipeline().addBefore("viatransformerin", "decompress", (ChannelHandler) ClassNames.getNettyCompressionDecoderClass().getConstructor(int.class).newInstance(threshold));
+			ctx.pipeline().addBefore("viatransformerout", "compress", (ChannelHandler) ClassNames.getNettyCompressionEncoderClass().getConstructor(int.class).newInstance(threshold));
 			return;
 		}
 
@@ -68,6 +69,7 @@ public class ViaTransformerIn extends ByteToMessageDecoder {
 			packetWrapper.clearInputBuffer();
 			return;
 		}
+
 		ByteBuf buffer = Unpooled.buffer();
 		packetWrapper.writeToBuffer(buffer);
 		buffer.readerIndex(0);

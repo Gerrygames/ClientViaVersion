@@ -1,14 +1,18 @@
 package de.gerrygames.the5zig.clientviaversion.main;
 
 import de.gerrygames.the5zig.clientviaversion.Version;
+import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
+import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.provider.TitleRenderProvider;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.providers.GameProfileProvider;
 import de.gerrygames.the5zig.clientviaversion.providers.ClientGameProfileProvider;
 import de.gerrygames.the5zig.clientviaversion.providers.ClientMovementTransmitterProvider;
+import de.gerrygames.the5zig.clientviaversion.providers.ClientTitleProvider;
+import de.gerrygames.the5zig.clientviaversion.providers.ClientTitleProviderTitleRenderer;
 import de.gerrygames.the5zig.clientviaversion.utils.Utils;
 import de.gerrygames.the5zig.clientviaversion.viaversion.CustomViaInjector;
 import eu.the5zig.mod.The5zigAPI;
-import eu.the5zig.mod.The5zigMod;
 import eu.the5zig.mod.event.*;
+import eu.the5zig.mod.modules.Category;
 import eu.the5zig.mod.plugin.Plugin;
 import de.gerrygames.the5zig.clientviaversion.asm.EntitySelectorsPatcher;
 import de.gerrygames.the5zig.clientviaversion.asm.SwordPatcher;
@@ -24,6 +28,8 @@ import de.gerrygames.the5zig.clientviaversion.viaversion.CustomViaPlatform;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import net.minecraft.realms.RealmsSharedConstants;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.Display;
 import us.myles.ViaVersion.ViaManager;
 import us.myles.ViaVersion.api.Via;
@@ -40,11 +46,13 @@ import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.HandItemProvider
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
 
 import java.lang.reflect.Field;
-import java.net.URLClassLoader;
+import java.lang.reflect.Method;
 import java.util.*;
 
 @Plugin(name = "ClientViaVersion", version = Version.PLUGIN_VERSION)
 public class ClientViaVersion {
+	public static final Logger LOGGER = LogManager.getLogger("ClientViaVersion");
+	
 	public static final int CLIENT_PROTOCOL_VERSION = RealmsSharedConstants.NETWORK_PROTOCOL_VERSION;
 	public static int spoofedVersion = CLIENT_PROTOCOL_VERSION;
 	public static List<ProtocolVersion> supportedVersion;
@@ -60,7 +68,6 @@ public class ClientViaVersion {
 
 	static {
 		LaunchClassLoader launchClassLoader = ((LaunchClassLoader)ClientViaVersion.class.getClassLoader().getParent());
-		URLClassLoader classLoader = ((URLClassLoader)ClientViaVersion.class.getClassLoader());
 		try {
 			Field field = LaunchClassLoader.class.getDeclaredField("transformers");
 			field.setAccessible(true);
@@ -111,6 +118,23 @@ public class ClientViaVersion {
 
 	@EventHandler
 	public void onLoad(LoadEvent e) {
+		ClientViaVersion.LOGGER.info("Minecraft Version: " + The5zigAPI.getAPI().getMinecraftVersion());
+		ClientViaVersion.LOGGER.info("5zig Version: " + The5zigAPI.getAPI().getModVersion());
+		ClientViaVersion.LOGGER.info("Forge installed: " + The5zigAPI.getAPI().isForgeEnvironment());
+		if (The5zigAPI.getAPI().isForgeEnvironment()) {
+			try {
+				ClientViaVersion.LOGGER.info("---Forge Mods---");
+				Object loader = Class.forName("net.minecraftforge.fml.common.Loader").getDeclaredMethod("instance").invoke(null);
+				List mods = (List) loader.getClass().getDeclaredMethod("getActiveModList").invoke(loader);
+				Method getVersion = Class.forName("net.minecraftforge.fml.common.ModContainer").getDeclaredMethod("getVersion");
+				Method getName = Class.forName("net.minecraftforge.fml.common.ModContainer").getDeclaredMethod("getName");
+				for (Object mod : mods) {
+					ClientViaVersion.LOGGER.info("" + getName.invoke(mod) + " " + getVersion.invoke(mod));
+				}
+				ClientViaVersion.LOGGER.info("---Forge Mods---");
+			} catch (Exception ignored) {}
+		}
+
 		instance = this;
 		Via.init(ViaManager.builder().platform(new CustomViaPlatform()).injector(new CustomViaInjector()).build());
 		Via.getManager().getProviders().use(BulkChunkTranslatorProvider.class, new BulkChunkTranslatorProvider());
@@ -118,12 +142,14 @@ public class ClientViaVersion {
 		Via.getManager().getProviders().use(HandItemProvider.class, new ClientHandItemProvider());
 		Via.getManager().getProviders().use(MovementTransmitterProvider.class, new ClientMovementTransmitterProvider());
 		Via.getManager().getProviders().use(GameProfileProvider.class, new ClientGameProfileProvider());
+		Via.getManager().getProviders().use(TitleRenderProvider.class, new ClientTitleProvider());
 
 		ProtocolVersion.register(new ProtocolVersion(5, "1.7.6-10"));
 		ProtocolRegistry.registerProtocol(new Protocol1_8TO1_7_6_10(), Collections.singletonList(47), 5);
 		ProtocolVersion.register(new ProtocolVersion(4, "1.7.1-5"));
 		ProtocolRegistry.registerProtocol(new Protocol1_7_6_10to1_7_1_5(), Collections.singletonList(5), 4);
 		ProtocolRegistry.registerProtocol(new Protocol1_8TO1_9(), Collections.singletonList(47), 107);
+		ProtocolRegistry.registerProtocol(new Protocol1_7_6_10TO1_8(), Collections.singletonList(5), 47);
 		ProtocolPatcher.patch();
 
 		supportedVersion = new ArrayList<>(ProtocolVersion.getProtocols());
@@ -139,14 +165,14 @@ public class ClientViaVersion {
 		selected = ProtocolVersion.getProtocol(CLIENT_PROTOCOL_VERSION);
 
 		if (supportedVersion.size()<=1 || selected==null) {
-			The5zigMod.logger.error("[ClientViaVersion] Unsupported clientversion. Disabling ClientViaVersion.");
+			ClientViaVersion.LOGGER.error("Unsupported clientversion. Disabling ClientViaVersion.");
 			return;
 		}
 
 		try {
 			Injector.injectListener();
 		} catch (Exception ex) {
-			The5zigMod.logger.error("[ClientViaVersion] Could not override logger (acting as listener). Disabling ClientViaVersion");
+			ClientViaVersion.LOGGER.error("Could not override logger (acting as listener). Disabling ClientViaVersion");
 			ex.printStackTrace();
 			return;
 		}
@@ -157,15 +183,19 @@ public class ClientViaVersion {
 			try {
 				SwordPatcher.patch();
 			} catch (Exception ex) {
-				The5zigMod.logger.error("[ClientViaVersion] Could not override Sword Items.");
+				ClientViaVersion.LOGGER.error("Could not override Sword Items.");
 				ex.printStackTrace();
 			}
+		}
+
+		if (CLIENT_PROTOCOL_VERSION < 47) {
+			The5zigAPI.getAPI().registerModuleItem(this, "Minecraft Title", ClientTitleProviderTitleRenderer.class, Category.GENERAL);
 		}
 
 		try {
 			Injector.patchCredits();
 		} catch (Exception ex) {
-			The5zigMod.logger.error("[ClientViaVersion] Could not edit credits. This has no effect on functionality.");
+			ClientViaVersion.LOGGER.error("Could not edit credits. This has no effect on functionality.");
 			ex.printStackTrace();
 		}
 
