@@ -52,6 +52,13 @@ public enum ItemReplacement {
 	DARK_OAK_DOOR(430, 324, "Dark Oak Door"),
 	ACACIA_DOOR(431, 324, "Acacia Door"),
 	ACTIVATOR_RAIL(157, 28, "Activator Rail"),
+	RAW_MUTTON(423, 363, "Raw Mutton"),
+	COOKED_MUTTON(424, 364, "Cooked Mutton"),
+	RAW_RABBIT(411, 365, "Raw Rabbit"),
+	COOKED_RABBIT(412, 366, "Cooked Rabbit"),
+	RABBIT_STEW(413, 282, "Rabbit Stew"),
+	RABBITS_FOOT(414, 375, "Rabbit's Foot"),
+	RABBIT_HIDE(415, 334, "Rabbit Hide"),
 	;
 
 	private int oldId, replacementId, oldData, replacementData;
