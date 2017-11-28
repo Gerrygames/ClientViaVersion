@@ -7,6 +7,7 @@ import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.ma
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.provider.TitleRenderProvider;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.storage.EntityTracker;
+import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.storage.LoadedChunks;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.storage.PlayerPosition;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.storage.GameProfileStorage;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.storage.Windows;
@@ -113,6 +114,12 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						packetWrapper.set(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0, item);
 					}
 				});
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						if (packetWrapper.get(Type.SHORT, 0)>4) packetWrapper.cancel();
+					}
+				});
 			}
 		});
 
@@ -166,7 +173,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						if ((flags & 0x02) == 0x02) {
 							y += playerPosition.getPosY();
 						}
-						y += 1.62;
+						y += 1.63;
 						packetWrapper.set(Type.DOUBLE, 1, y);
 						if ((flags & 0x04) == 0x04) {
 							double z = packetWrapper.get(Type.DOUBLE, 2);
@@ -188,8 +195,16 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 				create(new ValueCreator() {
 					@Override
 					public void write(PacketWrapper packetWrapper) throws Exception {
-						//packetWrapper.write(Type.BOOLEAN, packetWrapper.user().get(PlayerPosition.class).isOnGround());
-						packetWrapper.write(Type.BOOLEAN, true);
+						PlayerPosition playerPosition = packetWrapper.user().get(PlayerPosition.class);
+						packetWrapper.write(Type.BOOLEAN, playerPosition.isOnGround());
+						//packetWrapper.write(Type.BOOLEAN, true);
+					}
+				});
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						PlayerPosition playerPosition = packetWrapper.user().get(PlayerPosition.class);
+						playerPosition.setPositionPacketReceived(true);
 					}
 				});
 			}
@@ -526,7 +541,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.read(Type.BOOLEAN);  //OnGround
+						packetWrapper.read(Type.BOOLEAN);
 					}
 				});
 			}
@@ -542,7 +557,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.read(Type.BOOLEAN);  //OnGround
+						packetWrapper.read(Type.BOOLEAN);
 					}
 				});
 			}
@@ -561,7 +576,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.read(Type.BOOLEAN);  //OnGround
+						packetWrapper.read(Type.BOOLEAN);
 					}
 				});
 			}
@@ -580,7 +595,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.read(Type.BOOLEAN);  //OnGround
+						packetWrapper.read(Type.BOOLEAN);
 					}
 				});
 			}
@@ -718,6 +733,22 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						packetWrapper.write(Type.INT, position.getX().intValue());
 						packetWrapper.write(Type.UNSIGNED_BYTE, position.getY().shortValue());
 						packetWrapper.write(Type.INT, position.getZ().intValue());
+					}
+				});
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						int chunkX = packetWrapper.get(Type.INT, 0) >> 4;
+						int chunkZ = packetWrapper.get(Type.INT, 1) >> 4;
+
+						LoadedChunks loadedChunks = packetWrapper.user().get(LoadedChunks.class);
+						if (!loadedChunks.isLoaded(chunkX, chunkZ)) {
+							try {
+								ChunkPacketTransformer.getEmptyChunkPacket(chunkX, chunkZ, packetWrapper.user())
+										.send(Protocol1_7_6_10TO1_8.class, true, true);
+							} catch (Exception ex) {ex.printStackTrace();return;}
+							loadedChunks.load(chunkX, chunkZ);
+						}
 					}
 				});
 				handler(new PacketHandler() {
@@ -899,8 +930,10 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						packetWrapper.write(Type.UNSIGNED_BYTE, windowTypeId);
 						packetWrapper.user().get(Windows.class).types.put(windowId, windowTypeId);
 						String title = packetWrapper.read(Type.STRING);  //Title
-						boolean useProvidedWindowTitle = title.startsWith("{\"text\":");  //Use provided window title
-						title = title.substring(title.indexOf(":")+2, title.length()-2);
+						boolean useProvidedWindowTitle = title.startsWith("{");  //Use provided window title
+						if (useProvidedWindowTitle) {
+							title = TextComponent.toLegacyText(ComponentSerializer.parse(title));
+						}
 						packetWrapper.write(Type.STRING, title);  //Window title
 						packetWrapper.passthrough(Type.UNSIGNED_BYTE);
 						packetWrapper.write(Type.BOOLEAN, useProvidedWindowTitle);
@@ -1483,6 +1516,13 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						double z = packetWrapper.get(Type.DOUBLE, 2);
 
 						PlayerPosition playerPosition = packetWrapper.user().get(PlayerPosition.class);
+
+						if (playerPosition.isPositionPacketReceived()) {
+							playerPosition.setPositionPacketReceived(false);
+							feetY -= 0.01;
+							packetWrapper.set(Type.DOUBLE, 1, feetY);
+						}
+
 						playerPosition.setOnGround(packetWrapper.get(Type.BOOLEAN, 0));
 						playerPosition.setPos(x, feetY, z);
 					}
@@ -1517,6 +1557,13 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						float pitch = packetWrapper.get(Type.FLOAT, 1);
 
 						PlayerPosition playerPosition = packetWrapper.user().get(PlayerPosition.class);
+
+						if (playerPosition.isPositionPacketReceived()) {
+							playerPosition.setPositionPacketReceived(false);
+							feetY -= 0.01;
+							packetWrapper.set(Type.DOUBLE, 1, feetY);
+						}
+
 						playerPosition.setOnGround(packetWrapper.get(Type.BOOLEAN, 0));
 						playerPosition.setPos(x, feetY, z);
 						playerPosition.setYaw(yaw);
@@ -1753,6 +1800,14 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						packetWrapper.write(Type.UNSIGNED_BYTE, (short)(cape ? 1 : 0));
 					}
 				});
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						int viewDistance = packetWrapper.get(Type.BYTE, 0);
+						LoadedChunks loadedChunks = packetWrapper.user().get(LoadedChunks.class);
+						loadedChunks.setPlayerViewDistance(viewDistance);
+					}
+				});
 			}
 		});
 
@@ -1835,6 +1890,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 		userConnection.put(new GameProfileStorage(userConnection));
 		userConnection.put(new ClientChunks(userConnection));
 		userConnection.put(new MapPacketCache(userConnection));
+		userConnection.put(new LoadedChunks(userConnection));
 	}
 
 	private int getInventoryType(String name) {

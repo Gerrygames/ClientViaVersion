@@ -29,19 +29,12 @@ public class Chunk1_7_6_10to1_8 {
 					BlockStorage.BlockState state = ItemReplacement.replaceBlock(BlockStorage.rawToState(blockData));
 
 					blockIds[j] = (byte) state.getId();
-					/*int px = j & 15;
-					int py = j >> 8 & 15;
-					int pz = j >> 4 & 15;*/
-
-					//nibblearray.set(px, py, pz, state.getData());
 
 					if (j % 2 == 0) {
 						handle[j / 2] = (byte)(handle[j / 2] & 240 | state.getData() & 15);
 					} else {
 						handle[j / 2] = (byte)(handle[j / 2] & 15 | (state.getData() & 15) << 4);
 					}
-
-					//nibblearray.set(j, state.getData());
 				}
 			} else if (this.storageArrays[i] != null && groundUp) {
 				this.storageArrays[i] = null;
