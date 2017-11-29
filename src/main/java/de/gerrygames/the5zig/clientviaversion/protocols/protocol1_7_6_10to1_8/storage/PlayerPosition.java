@@ -8,6 +8,7 @@ public class PlayerPosition extends StoredObject {
 	private float yaw, pitch;
 	private boolean onGround;
 	private boolean positionPacketReceived;
+	private double receivedPosY;
 
 	public PlayerPosition(UserConnection user) {
 		super(user);
@@ -25,6 +26,14 @@ public class PlayerPosition extends StoredObject {
 
 	public void setPositionPacketReceived(boolean positionPacketReceived) {
 		this.positionPacketReceived = positionPacketReceived;
+	}
+
+	public double getReceivedPosY() {
+		return receivedPosY;
+	}
+
+	public void setReceivedPosY(double receivedPosY) {
+		this.receivedPosY = receivedPosY;
 	}
 
 	public double getPosX() {

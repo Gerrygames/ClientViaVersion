@@ -10,6 +10,7 @@ import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.st
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.storage.LoadedChunks;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.storage.PlayerPosition;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.storage.GameProfileStorage;
+import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.storage.Scoreboard;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.storage.Windows;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.types.CustomIntType;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.types.CustomStringType;
@@ -162,6 +163,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						PlayerPosition playerPosition = packetWrapper.user().get(PlayerPosition.class);
+						playerPosition.setPositionPacketReceived(true);
 
 						int flags = packetWrapper.read(Type.BYTE);
 						if ((flags & 0x01) == 0x01) {
@@ -173,7 +175,8 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						if ((flags & 0x02) == 0x02) {
 							y += playerPosition.getPosY();
 						}
-						y += 1.63;
+						playerPosition.setReceivedPosY(y);
+						y += 1.621;
 						packetWrapper.set(Type.DOUBLE, 1, y);
 						if ((flags & 0x04) == 0x04) {
 							double z = packetWrapper.get(Type.DOUBLE, 2);
@@ -204,7 +207,6 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						PlayerPosition playerPosition = packetWrapper.user().get(PlayerPosition.class);
-						playerPosition.setPositionPacketReceived(true);
 					}
 				});
 			}
@@ -934,6 +936,9 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						if (useProvidedWindowTitle) {
 							title = TextComponent.toLegacyText(ComponentSerializer.parse(title));
 						}
+						if (title.length()>32) {
+							title = title.substring(0, 32);
+						}
 						packetWrapper.write(Type.STRING, title);  //Window title
 						packetWrapper.passthrough(Type.UNSIGNED_BYTE);
 						packetWrapper.write(Type.BOOLEAN, useProvidedWindowTitle);
@@ -1123,6 +1128,15 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 				});
 				map(Type.UNSIGNED_BYTE);  //Action
 				map(Type.NBT, Types1_7_6_10.COMPRESSED_NBT);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						LoadedChunks loadedChunks = packetWrapper.user().get(LoadedChunks.class);
+						int chunkX = packetWrapper.get(Type.INT, 0) >> 4;
+						int chunkZ = packetWrapper.get(Type.INT, 1) >> 4;
+						if (!loadedChunks.isLoaded(chunkX, chunkZ)) packetWrapper.cancel();
+					}
+				});
 			}
 		});
 
@@ -1175,7 +1189,8 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 								}
 
 								PacketWrapper packet = new PacketWrapper(0x38, null, packetWrapper.user());
-								packet.write(Type.STRING, gameProfile.getDisplayName());
+								//packet.write(Type.STRING, gameProfile.getDisplayName());
+								packet.write(Type.STRING, gameProfile.name);
 								packet.write(Type.BOOLEAN, true);
 								packet.write(Type.SHORT, (short) ping);
 								packet.send(Protocol1_7_6_10TO1_8.class);
@@ -1194,32 +1209,33 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 								packet.send(Protocol1_7_6_10TO1_8.class);
 							} else if (action==3) {
 								String displayName = packetWrapper.read(Type.BOOLEAN) ? packetWrapper.read(Type.STRING) : null;
-								displayName = GameProfileStorage.GameProfile.fixDisplayName(displayName);
+								if (displayName!=null) displayName = GameProfileStorage.GameProfile.fixDisplayName(displayName);
 
 								GameProfileStorage.GameProfile gameProfile = gameProfileStorage.get(uuid);
 								if (gameProfile==null || gameProfile.displayName==null && displayName==null) continue;
 
 								if (gameProfile.displayName==null && displayName!=null || gameProfile.displayName!=null && displayName==null || !gameProfile.displayName.equals(displayName)) {
-									PacketWrapper packet = new PacketWrapper(0x38, null, packetWrapper.user());
+									/*PacketWrapper packet = new PacketWrapper(0x38, null, packetWrapper.user());
 									packet.write(Type.STRING, gameProfile.getDisplayName());
 									packet.write(Type.BOOLEAN, false);
 									packet.write(Type.SHORT, (short) gameProfile.ping);
-									packet.send(Protocol1_7_6_10TO1_8.class);
+									packet.send(Protocol1_7_6_10TO1_8.class);*/
 
 									gameProfile.setDisplayName(displayName);
 
-									packet = new PacketWrapper(0x38, null, packetWrapper.user());
+									/*packet = new PacketWrapper(0x38, null, packetWrapper.user());
 									packet.write(Type.STRING, gameProfile.getDisplayName());
 									packet.write(Type.BOOLEAN, true);
 									packet.write(Type.SHORT, (short) gameProfile.ping);
-									packet.send(Protocol1_7_6_10TO1_8.class);
+									packet.send(Protocol1_7_6_10TO1_8.class);*/
 								}
 							} else if (action==4) {
 								GameProfileStorage.GameProfile gameProfile = gameProfileStorage.get(uuid);
 								if (gameProfile==null) continue;
 
 								PacketWrapper packet = new PacketWrapper(0x38, null, packetWrapper.user());
-								packet.write(Type.STRING, gameProfile.getDisplayName());
+								//packet.write(Type.STRING, gameProfile.getDisplayName());
+								packet.write(Type.STRING, gameProfile.name);
 								packet.write(Type.BOOLEAN, false);
 								packet.write(Type.SHORT, (short) gameProfile.ping);
 								packet.send(Protocol1_7_6_10TO1_8.class);
@@ -1267,7 +1283,11 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						String name = packetWrapper.passthrough(Type.STRING);
 						if (name.length()>16) {
-							packetWrapper.set(Type.STRING, 0, name.substring(0, 16));
+							name = ChatColor.stripColor(name);
+							if (name.length()>16) {
+								name = name.substring(0, 16);
+							}
+							packetWrapper.set(Type.STRING, 0, name);
 						}
 						byte mode = packetWrapper.passthrough(Type.BYTE);
 						String objective = packetWrapper.read(Type.STRING);
@@ -1293,7 +1313,18 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
+						String team = packetWrapper.get(Type.STRING, 0);
 						byte mode = packetWrapper.passthrough(Type.BYTE);
+
+						Scoreboard scoreboard = packetWrapper.user().get(Scoreboard.class);
+
+						if (mode==1) {
+							scoreboard.removeTeam(team);
+						} else if (mode!=0 && !scoreboard.teamExists(team)) {
+							packetWrapper.cancel();
+							return;
+						}
+
 						if (mode==0 || mode==2) {
 							packetWrapper.passthrough(Type.STRING);
 							packetWrapper.passthrough(Type.STRING);
@@ -1305,7 +1336,25 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						if (mode==0 || mode==3 || mode==4) {
 							String[] entries = new String[packetWrapper.read(Type.VAR_INT)];
 
-							for (int i = 0; i<entries.length; i++) entries[i] = packetWrapper.read(Type.STRING);
+							int removed = 0;
+							for (int i = 0; i<entries.length-removed; i++) {
+								String player = entries[i] = packetWrapper.read(Type.STRING);
+								if (mode==4) {
+									if (!scoreboard.isPlayerInTeam(player, team)) {
+										entries[i--] = null;
+										removed++;
+									} else {
+										scoreboard.removePlayerFromTeam(player, team);
+									}
+								} else {
+									scoreboard.addPlayerToTeam(player, team);
+								}
+							}
+							if (removed>0) {
+								String[] temp = entries;
+								entries = new String[temp.length-removed];
+								System.arraycopy(temp, 0, entries, 0, temp.length-removed);
+							}
 
 							packetWrapper.write(Type.SHORT, (short)entries.length);
 							CustomStringType type = new CustomStringType(entries.length);
@@ -1560,7 +1609,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 
 						if (playerPosition.isPositionPacketReceived()) {
 							playerPosition.setPositionPacketReceived(false);
-							feetY -= 0.01;
+							feetY = playerPosition.getReceivedPosY();
 							packetWrapper.set(Type.DOUBLE, 1, feetY);
 						}
 
@@ -1891,6 +1940,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 		userConnection.put(new ClientChunks(userConnection));
 		userConnection.put(new MapPacketCache(userConnection));
 		userConnection.put(new LoadedChunks(userConnection));
+		userConnection.put(new Scoreboard(userConnection));
 	}
 
 	private int getInventoryType(String name) {
