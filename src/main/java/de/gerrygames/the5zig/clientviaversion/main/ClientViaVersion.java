@@ -11,7 +11,6 @@ import de.gerrygames.the5zig.clientviaversion.providers.ClientTitleProviderTitle
 import de.gerrygames.the5zig.clientviaversion.utils.Utils;
 import de.gerrygames.the5zig.clientviaversion.viaversion.CustomViaInjector;
 import eu.the5zig.mod.The5zigAPI;
-import eu.the5zig.mod.The5zigMod;
 import eu.the5zig.mod.event.*;
 import eu.the5zig.mod.modules.Category;
 import eu.the5zig.mod.plugin.Plugin;
@@ -207,10 +206,6 @@ public class ClientViaVersion {
 
 	@EventHandler
 	public void onServerJoin(ServerJoinEvent e) {
-		if (spoofedVersion!=CLIENT_PROTOCOL_VERSION && e.getHost().toLowerCase().contains("timolia")) {
-			The5zigMod.getVars().disconnectFromWorld();
-			return;
-		}
 		if (spoofedVersion<=47 && CLIENT_PROTOCOL_VERSION > 47) {
 			Scheduler.runTaskTimerLater(AttributeManager::sendAttackSpeed, 40L, 40L);
 			Scheduler.runTaskTimerLater(AttributeManager::sendArmorUpdate, 10L, 10L);

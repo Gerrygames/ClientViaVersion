@@ -6,6 +6,7 @@ import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.ch
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.metadata.MetadataRewriter;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.providers.GameProfileProvider;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.storage.EntityTracker;
+import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.storage.MapStorage;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.storage.Tablist;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.storage.Windows;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.types.CustomStringType;
@@ -25,6 +26,7 @@ import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.*;
 import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.api.type.types.CustomByteType;
 import us.myles.ViaVersion.api.type.types.VoidType;
 import us.myles.ViaVersion.api.type.types.version.Types1_8;
 import us.myles.ViaVersion.packets.State;
@@ -139,7 +141,7 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						packetWrapper.read(Type.BOOLEAN);  //OnGround
-						packetWrapper.write(Type.BYTE, (byte) 0);  //BitField that does something I guess?
+						packetWrapper.write(Type.BYTE, (byte) 0);  //BitMask
 					}
 				});
 			}
@@ -643,14 +645,14 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 						int amount = packetWrapper.read(Type.INT);
 						packetWrapper.write(Type.INT, amount);
 						for (int i = 0; i<amount; i++) {
-							packetWrapper.write(Type.STRING, packetWrapper.read(Type.STRING));
-							packetWrapper.write(Type.DOUBLE, packetWrapper.read(Type.DOUBLE));
+							packetWrapper.passthrough(Type.STRING);
+							packetWrapper.passthrough(Type.DOUBLE);
 							int modifierlength = packetWrapper.read(Type.SHORT);
 							packetWrapper.write(Type.VAR_INT, modifierlength);
 							for (int j = 0; j<modifierlength; j++) {
-								packetWrapper.write(Type.UUID, packetWrapper.read(Type.UUID));
-								packetWrapper.write(Type.DOUBLE, packetWrapper.read(Type.DOUBLE));
-								packetWrapper.write(Type.BYTE, packetWrapper.read(Type.BYTE));
+								packetWrapper.passthrough(Type.UUID);
+								packetWrapper.passthrough(Type.DOUBLE);
+								packetWrapper.passthrough(Type.BYTE);
 							}
 						}
 					}
@@ -790,14 +792,14 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 						if (particle == null) particle = Particle.CRIT;
 						packetWrapper.write(Type.INT, particle.ordinal());
 						packetWrapper.write(Type.BOOLEAN, false);
-						packetWrapper.write(Type.FLOAT, packetWrapper.read(Type.FLOAT));
-						packetWrapper.write(Type.FLOAT, packetWrapper.read(Type.FLOAT));
-						packetWrapper.write(Type.FLOAT, packetWrapper.read(Type.FLOAT));
-						packetWrapper.write(Type.FLOAT, packetWrapper.read(Type.FLOAT));
-						packetWrapper.write(Type.FLOAT, packetWrapper.read(Type.FLOAT));
-						packetWrapper.write(Type.FLOAT, packetWrapper.read(Type.FLOAT));
-						packetWrapper.write(Type.FLOAT, packetWrapper.read(Type.FLOAT));
-						packetWrapper.write(Type.INT, packetWrapper.read(Type.INT));
+						packetWrapper.passthrough(Type.FLOAT);
+						packetWrapper.passthrough(Type.FLOAT);
+						packetWrapper.passthrough(Type.FLOAT);
+						packetWrapper.passthrough(Type.FLOAT);
+						packetWrapper.passthrough(Type.FLOAT);
+						packetWrapper.passthrough(Type.FLOAT);
+						packetWrapper.passthrough(Type.FLOAT);
+						packetWrapper.passthrough(Type.INT);
 						for(int i = 0; i < particle.extra; ++i) {
 							int toWrite = 0;
 							if (parts.length - 1 > i) {
@@ -859,7 +861,7 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 						}
 						packetWrapper.write(Type.STRING, title);  //Window title
 						packetWrapper.write(Type.UNSIGNED_BYTE, slots);
-						if (packetWrapper.get(Type.UNSIGNED_BYTE, 0)==11) packetWrapper.write(Type.INT, packetWrapper.read(Type.INT));  //Entity Id
+						if (packetWrapper.get(Type.UNSIGNED_BYTE, 0)==11) packetWrapper.passthrough(Type.INT);  //Entity Id
 					}
 				});
 			}
@@ -891,9 +893,8 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						short windowId = packetWrapper.read(Type.UNSIGNED_BYTE);  //Window Id
+						short windowId = packetWrapper.passthrough(Type.UNSIGNED_BYTE);  //Window Id
 						short windowType = packetWrapper.user().get(Windows.class).get(windowId);
-						packetWrapper.write(Type.UNSIGNED_BYTE, windowId);
 						Item[] items = packetWrapper.read(Types1_7_6_10.COMPRESSED_NBT_ITEM_ARRAY);
 						if (windowType==4) {
 							Item[] old = items;
@@ -924,16 +925,72 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.write(Type.STRING, "{\"text\": \"" + packetWrapper.read(Type.STRING) + "\"}");  //Line 1
-						packetWrapper.write(Type.STRING, "{\"text\": \"" + packetWrapper.read(Type.STRING) + "\"}");  //Line 2
-						packetWrapper.write(Type.STRING, "{\"text\": \"" + packetWrapper.read(Type.STRING) + "\"}");  //Line 3
-						packetWrapper.write(Type.STRING, "{\"text\": \"" + packetWrapper.read(Type.STRING) + "\"}");  //Line 4
+						for (int i = 0; i<4; i++)
+							packetWrapper.write(Type.STRING, "{\"text\": \"" + packetWrapper.read(Type.STRING) + "\"}");
 					}
 				});
 			}
 		});
 
-		//Maps TODO
+		//Map
+		this.registerOutgoing(State.PLAY, 0x34, 0x34, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.VAR_INT);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						int id = packetWrapper.get(Type.VAR_INT, 0);
+						int length = packetWrapper.read(Type.SHORT);
+						byte[] data = packetWrapper.read(new CustomByteType(length));
+
+						MapStorage mapStorage = packetWrapper.user().get(MapStorage.class);
+						MapStorage.MapData mapData = mapStorage.getMapData(id);
+						if (mapData==null) mapStorage.putMapData(id, mapData = new MapStorage.MapData());
+
+						if (data[0]==1) {
+							int count = (data.length-1) / 3;
+							mapData.mapIcons = new MapStorage.MapIcon[count];
+
+							for (int i = 0; i<count; i++) {
+								mapData.mapIcons[i] = new MapStorage.MapIcon((byte) (data[i*3+1] >> 4), (byte) (data[i*3+1] & 0xF), data[i*3+2], data[i*3+3]);
+							}
+						} else if (data[0]==2) {
+							mapData.scale = data[1];
+						}
+
+						packetWrapper.write(Type.BYTE, mapData.scale);
+						packetWrapper.write(Type.VAR_INT, mapData.mapIcons.length);
+						for (MapStorage.MapIcon mapIcon : mapData.mapIcons) {
+							packetWrapper.write(Type.BYTE, (byte)(mapIcon.direction << 4 | mapIcon.type & 0xF));
+							packetWrapper.write(Type.BYTE, mapIcon.x);
+							packetWrapper.write(Type.BYTE, mapIcon.z);
+						}
+
+						if (data[0]==0) {
+							byte x = data[1];
+							byte z = data[2];
+							int rows = data.length-3;
+
+							packetWrapper.write(Type.BYTE, (byte)1);
+							packetWrapper.write(Type.BYTE, (byte)rows);
+							packetWrapper.write(Type.BYTE, x);
+							packetWrapper.write(Type.BYTE, z);
+
+							Byte[] newData = new Byte[rows];
+
+							for (int i = 0; i<rows; i++) {
+								newData[i] = data[i+3];
+							}
+
+							packetWrapper.write(Type.BYTE_ARRAY, newData);
+						} else {
+							packetWrapper.write(Type.BYTE, (byte)0);
+						}
+					}
+				});
+			}
+		});
 
 		//Update Block Entity
 		this.registerOutgoing(State.PLAY, 0x35, 0x35, new PacketRemapper() {
@@ -1044,11 +1101,10 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						String name = packetWrapper.read(Type.STRING);
+						String name = packetWrapper.passthrough(Type.STRING);
 						String value = packetWrapper.read(Type.STRING);
 						byte mode = packetWrapper.read(Type.BYTE);
 
-						packetWrapper.write(Type.STRING, name);
 						packetWrapper.write(Type.BYTE, mode);
 						if (mode==0 || mode==2) {
 							packetWrapper.write(Type.STRING, value);
@@ -1066,13 +1122,10 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						String name = packetWrapper.read(Type.STRING);
-						byte mode = packetWrapper.read(Type.BYTE);
-						packetWrapper.write(Type.STRING, name);
-						packetWrapper.write(Type.BYTE, mode);
+						String name = packetWrapper.passthrough(Type.STRING);
+						byte mode = packetWrapper.passthrough(Type.BYTE);
 						if (mode!=1) {
-							String objective = packetWrapper.read(Type.STRING);
-							packetWrapper.write(Type.STRING, objective);
+							String objective = packetWrapper.passthrough(Type.STRING);
 							packetWrapper.user().get(Scoreboard.class).put(name, objective);
 							packetWrapper.write(Type.VAR_INT, packetWrapper.read(Type.INT));
 						} else {
@@ -1095,10 +1148,10 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 						byte mode = packetWrapper.read(Type.BYTE);
 						packetWrapper.write(Type.BYTE, mode);
 						if (mode==0 || mode==2) {
-							packetWrapper.write(Type.STRING, packetWrapper.read(Type.STRING));
-							packetWrapper.write(Type.STRING, packetWrapper.read(Type.STRING));
-							packetWrapper.write(Type.STRING, packetWrapper.read(Type.STRING));
-							packetWrapper.write(Type.BYTE, packetWrapper.read(Type.BYTE));
+							packetWrapper.passthrough(Type.STRING);
+							packetWrapper.passthrough(Type.STRING);
+							packetWrapper.passthrough(Type.STRING);
+							packetWrapper.passthrough(Type.BYTE);
 							packetWrapper.write(Type.STRING, "always");
 							packetWrapper.write(Type.BYTE, (byte) 0);
 						}
@@ -1192,7 +1245,7 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 							buf.release();
 						} else {
 							for (int i = 0; i<length; i++) {
-								packetWrapper.write(Type.BYTE, packetWrapper.read(Type.BYTE));
+								packetWrapper.passthrough(Type.BYTE);
 							}
 							if (channel.equals("MC|AdvCdm")) packetWrapper.write(Type.BYTE, (byte)1);
 						}
@@ -1239,8 +1292,7 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						double feetY = packetWrapper.read(Type.DOUBLE);
-						packetWrapper.write(Type.DOUBLE, feetY);  //FeetY
+						double feetY = packetWrapper.passthrough(Type.DOUBLE);
 						packetWrapper.write(Type.DOUBLE, feetY+1.62);  //HeadY
 					}
 				});
@@ -1257,8 +1309,7 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						double feetY = packetWrapper.read(Type.DOUBLE);
-						packetWrapper.write(Type.DOUBLE, feetY);  //FeetY
+						double feetY = packetWrapper.passthrough(Type.DOUBLE);
 						packetWrapper.write(Type.DOUBLE, feetY+1.62);  //HeadY
 					}
 				});
@@ -1426,10 +1477,8 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 						packetWrapper.write(Type.SHORT, (short)pos.getY().intValue());
 						packetWrapper.write(Type.INT, pos.getZ().intValue());
 
-						packetWrapper.write(Type.STRING, GsonUtil.getGson().fromJson(packetWrapper.read(Type.STRING), ChatComponent.class).text);
-						packetWrapper.write(Type.STRING, GsonUtil.getGson().fromJson(packetWrapper.read(Type.STRING), ChatComponent.class).text);
-						packetWrapper.write(Type.STRING, GsonUtil.getGson().fromJson(packetWrapper.read(Type.STRING), ChatComponent.class).text);
-						packetWrapper.write(Type.STRING, GsonUtil.getGson().fromJson(packetWrapper.read(Type.STRING), ChatComponent.class).text);
+						for (int i = 0; i<4; i++)
+							packetWrapper.write(Type.STRING, GsonUtil.getGson().fromJson(packetWrapper.read(Type.STRING), ChatComponent.class).text);
 					}
 				});
 			}
@@ -1503,12 +1552,12 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 						int publicKeyLength = packetWrapper.read(Type.SHORT);
 						packetWrapper.write(Type.VAR_INT, publicKeyLength);
 						for (int i = 0; i<publicKeyLength; i++) {
-							packetWrapper.write(Type.BYTE, packetWrapper.read(Type.BYTE));
+							packetWrapper.passthrough(Type.BYTE);
 						}
 						int verifyTokenLength = packetWrapper.read(Type.SHORT);
 						packetWrapper.write(Type.VAR_INT, verifyTokenLength);
 						for (int i = 0; i<verifyTokenLength; i++) {
-							packetWrapper.write(Type.BYTE, packetWrapper.read(Type.BYTE));
+							packetWrapper.passthrough(Type.BYTE);
 						}
 					}
 				});
@@ -1525,12 +1574,12 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 						int sharedSecretLength = packetWrapper.read(Type.VAR_INT);
 						packetWrapper.write(Type.SHORT, (short) sharedSecretLength);
 						for (int i = 0; i<sharedSecretLength; i++) {
-							packetWrapper.write(Type.BYTE, packetWrapper.read(Type.BYTE));
+							packetWrapper.passthrough(Type.BYTE);
 						}
 						int verifyTokenLength = packetWrapper.read(Type.VAR_INT);
 						packetWrapper.write(Type.SHORT, (short) verifyTokenLength);
 						for (int i = 0; i<verifyTokenLength; i++) {
-							packetWrapper.write(Type.BYTE, packetWrapper.read(Type.BYTE));
+							packetWrapper.passthrough(Type.BYTE);
 						}
 					}
 				});
@@ -1544,6 +1593,7 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 		userConnection.put(new Windows(userConnection));
 		userConnection.put(new Scoreboard(userConnection));
 		userConnection.put(new EntityTracker(userConnection));
+		userConnection.put(new MapStorage(userConnection));
 	}
 
 	private boolean isPlayerInsideBlock(long x, long y, long z, byte direction) {

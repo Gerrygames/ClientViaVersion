@@ -443,9 +443,9 @@ public class Protocol1_8TO1_9 extends Protocol {
 						int count = packetWrapper.read(Type.INT);
 						packetWrapper.write(Type.INT, count);
 						for (int i = 0; i<count; i++) {
-							packetWrapper.write(Type.UNSIGNED_BYTE, packetWrapper.read(Type.UNSIGNED_BYTE));
-							packetWrapper.write(Type.UNSIGNED_BYTE, packetWrapper.read(Type.UNSIGNED_BYTE));
-							packetWrapper.write(Type.UNSIGNED_BYTE, packetWrapper.read(Type.UNSIGNED_BYTE));
+							packetWrapper.passthrough(Type.UNSIGNED_BYTE);
+							packetWrapper.passthrough(Type.UNSIGNED_BYTE);
+							packetWrapper.passthrough(Type.UNSIGNED_BYTE);
 						}
 					}
 				});
@@ -846,8 +846,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						int mode = packetWrapper.get(Type.BYTE, 0);
 						if (mode==0 || mode==2) {
-							packetWrapper.write(Type.STRING, packetWrapper.read(Type.STRING));
-							packetWrapper.write(Type.STRING, packetWrapper.read(Type.STRING));
+							packetWrapper.passthrough(Type.STRING);
+							packetWrapper.passthrough(Type.STRING);
 						}
 					}
 				});
@@ -905,20 +905,20 @@ public class Protocol1_8TO1_9 extends Protocol {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						byte mode = packetWrapper.get(Type.BYTE, 0);
 						if (mode==0 || mode==2) {
-							packetWrapper.write(Type.STRING, packetWrapper.read(Type.STRING));  //Display Name
-							packetWrapper.write(Type.STRING, packetWrapper.read(Type.STRING));  //Prefix
-							packetWrapper.write(Type.STRING, packetWrapper.read(Type.STRING));  //Suffix
-							packetWrapper.write(Type.BYTE, packetWrapper.read(Type.BYTE));  //Friendly Flags
-							packetWrapper.write(Type.STRING, packetWrapper.read(Type.STRING));  //Name Tag Visibility
+							packetWrapper.passthrough(Type.STRING);  //Display Name
+							packetWrapper.passthrough(Type.STRING);  //Prefix
+							packetWrapper.passthrough(Type.STRING);  //Suffix
+							packetWrapper.passthrough(Type.BYTE);  //Friendly Flags
+							packetWrapper.passthrough(Type.STRING);  //Name Tag Visibility
 							packetWrapper.read(Type.STRING);  //Skip Collision Rule
-							packetWrapper.write(Type.BYTE, packetWrapper.read(Type.BYTE));  //Friendly Flags
+							packetWrapper.passthrough(Type.BYTE);  //Friendly Flags
 						}
 
 						if (mode==0 || mode==3 || mode==4) {
 							int size = packetWrapper.read(Type.VAR_INT);
 							packetWrapper.write(Type.VAR_INT, size);
 							for (int i = 0; i<size; i++) {
-								packetWrapper.write(Type.STRING, packetWrapper.read(Type.STRING));
+								packetWrapper.passthrough(Type.STRING);
 							}
 						}
 					}
@@ -1052,9 +1052,9 @@ public class Protocol1_8TO1_9 extends Protocol {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						int type = packetWrapper.get(Type.VAR_INT, 1);
 						if (type==2) {
-							packetWrapper.write(Type.FLOAT, packetWrapper.read(Type.FLOAT));
-							packetWrapper.write(Type.FLOAT, packetWrapper.read(Type.FLOAT));
-							packetWrapper.write(Type.FLOAT, packetWrapper.read(Type.FLOAT));
+							packetWrapper.passthrough(Type.FLOAT);
+							packetWrapper.passthrough(Type.FLOAT);
+							packetWrapper.passthrough(Type.FLOAT);
 						}
 						if (type==2 || type==0) {
 							packetWrapper.write(Type.VAR_INT, 0);
@@ -1350,7 +1350,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						boolean hasPosition = packetWrapper.get(Type.BOOLEAN, 1);
-						if (hasPosition) packetWrapper.write(Type.POSITION, packetWrapper.read(Type.POSITION));
+						if (hasPosition) packetWrapper.passthrough(Type.POSITION);
 					}
 				});
 			}
