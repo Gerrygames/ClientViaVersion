@@ -33,10 +33,8 @@ public class Utils {
 
 	public static String jsonToLegacy(String json) {
 		String legacy = json.startsWith("{") ? TextComponent.toLegacyText(ComponentSerializer.parse(json)) : json;
-		ClientViaVersion.LOGGER.info("json: " + json + " -> legacy: " + legacy);
 		if (legacy.startsWith("§f§f")) legacy = legacy.substring(4, legacy.length());
 		legacy = legacy.replaceAll("((§.)*)\"(.*)\"((§.)*)", "$1$3$4");
-		ClientViaVersion.LOGGER.info("fixed legacy: " + legacy);
 		return legacy;
 	}
 
