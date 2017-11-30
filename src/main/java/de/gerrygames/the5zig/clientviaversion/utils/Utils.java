@@ -32,6 +32,7 @@ public class Utils {
 	}
 
 	public static String jsonToLegacy(String json) {
+		if (json==null) return null;
 		String legacy = json.startsWith("{") ? TextComponent.toLegacyText(ComponentSerializer.parse(json)) : json;
 		if (legacy.startsWith("§f§f")) legacy = legacy.substring(4, legacy.length());
 		legacy = legacy.replaceAll("((§.)*)\"(.*)\"((§.)*)", "$1$3$4");
@@ -39,6 +40,7 @@ public class Utils {
 	}
 
 	public static String removeUnusedColor(String legacy) {
+		if (legacy==null) return null;
 		legacy = legacy.replaceAll("§[0-f](§[0-f|r])", "$1");
 		legacy = legacy.replaceAll("(§.)?\\1", "$1");
 		legacy = legacy.replaceAll("(§.)*\\Z", "");
