@@ -7,10 +7,15 @@ import eu.the5zig.mod.manager.AutoReconnectManager;
 import io.netty.channel.Channel;
 import io.netty.util.AttributeKey;
 import de.gerrygames.the5zig.clientviaversion.main.ClientViaVersion;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.packets.State;
+import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
+import us.myles.viaversion.libs.opennbt.tag.builtin.Tag;
 
 import java.lang.reflect.Field;
+import java.util.function.Consumer;
 
 public class Utils {
 	public static State currentState = null;
@@ -24,6 +29,29 @@ public class Utils {
 			return (nmsItemStackToItem(field.get(itemStack)));
 		} catch (Exception ex) {ex.printStackTrace();}
 		return airItem();
+	}
+
+	public static String jsonToLegacy(String json) {
+		String legacy = json.startsWith("{") ? TextComponent.toLegacyText(ComponentSerializer.parse(json)) : json;
+		ClientViaVersion.LOGGER.info("json: " + json + " -> legacy: " + legacy);
+		if (legacy.startsWith("§f§f")) legacy = legacy.substring(4, legacy.length());
+		legacy = legacy.replaceAll("((§.)*)\"(.*)\"((§.)*)", "$1$3$4");
+		ClientViaVersion.LOGGER.info("fixed legacy: " + legacy);
+		return legacy;
+	}
+
+	public static String removeUnusedColor(String legacy) {
+		legacy = legacy.replaceAll("§[0-f](§[0-f|r])", "$1");
+		legacy = legacy.replaceAll("(§.)?\\1", "$1");
+		legacy = legacy.replaceAll("(§.)*\\Z", "");
+		return legacy;
+	}
+
+	public static void iterateCompountTagRecursive(CompoundTag tag, final Consumer<Tag> action) {
+		tag.values().forEach(child -> {
+			if (child instanceof CompoundTag) iterateCompountTagRecursive((CompoundTag) child, action);
+			else action.accept(child);
+		});
 	}
 
 	public static Item nmsItemStackToItem(Object itemStack) {

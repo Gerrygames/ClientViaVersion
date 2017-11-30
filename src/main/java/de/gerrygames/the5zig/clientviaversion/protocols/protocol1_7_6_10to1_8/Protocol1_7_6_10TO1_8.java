@@ -16,11 +16,10 @@ import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.ty
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.types.CustomStringType;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.types.Types1_7_6_10;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_9.chunks.BlockStorage;
+import de.gerrygames.the5zig.clientviaversion.utils.Utils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -39,6 +38,8 @@ import us.myles.ViaVersion.api.type.types.version.Types1_8;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
+import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
+import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -934,7 +935,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						String title = packetWrapper.read(Type.STRING);  //Title
 						boolean useProvidedWindowTitle = title.startsWith("{");  //Use provided window title
 						if (useProvidedWindowTitle) {
-							title = TextComponent.toLegacyText(ComponentSerializer.parse(title));
+							title = Utils.jsonToLegacy(title);
 						}
 						if (title.length()>32) {
 							title = title.substring(0, 32);
@@ -1026,9 +1027,8 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						for (int i = 0; i<4; i++) {
 							String line = packetWrapper.read(Type.STRING);
-							if (line.startsWith("{")) {
-								line = TextComponent.toLegacyText(ComponentSerializer.parse(line));
-							}
+							line = Utils.jsonToLegacy(line);
+							line = Utils.removeUnusedColor(line);
 							if (line.length()>15) {
 								line = ChatColor.stripColor(line);
 								if (line.length()>15) line = line.substring(0, 15);
@@ -1128,6 +1128,20 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 				});
 				map(Type.UNSIGNED_BYTE);  //Action
 				map(Type.NBT, Types1_7_6_10.COMPRESSED_NBT);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						CompoundTag nbt = packetWrapper.get(Types1_7_6_10.COMPRESSED_NBT, 0);
+						Utils.iterateCompountTagRecursive(nbt, tag -> {
+							if (tag instanceof StringTag) {
+								String value = (String) tag.getValue();
+								value = Utils.jsonToLegacy(value);
+								value = Utils.removeUnusedColor(value);
+								((StringTag) tag).setValue(value);
+							}
+						});
+					}
+				});
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
@@ -1318,12 +1332,20 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 
 						Scoreboard scoreboard = packetWrapper.user().get(Scoreboard.class);
 
-						if (mode==1) {
-							scoreboard.removeTeam(team);
-						} else if (mode!=0 && !scoreboard.teamExists(team)) {
+						if (mode!=0 && !scoreboard.teamExists(team)) {
 							packetWrapper.cancel();
 							return;
+						} else if (mode==0 && scoreboard.teamExists(team)) {
+							scoreboard.removeTeam(team);
+
+							PacketWrapper remove = new PacketWrapper(0x3E, null, packetWrapper.user());
+							remove.write(Type.STRING, team);
+							remove.write(Type.BYTE, (byte)1);
+							remove.send(Protocol1_7_6_10TO1_8.class, true, true);
 						}
+
+						if (mode==0) scoreboard.addTeam(team);
+						else if (mode==1) scoreboard.removeTeam(team);
 
 						if (mode==0 || mode==2) {
 							packetWrapper.passthrough(Type.STRING);
@@ -1333,7 +1355,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 							packetWrapper.read(Type.STRING);
 							packetWrapper.read(Type.BYTE);
 						}
-						if (mode==0 || mode==3 || mode==4) {
+						if (mode==0 || mode==3 || mode==4 || mode==5) {
 							String[] entries = new String[packetWrapper.read(Type.VAR_INT)];
 
 							int removed = 0;

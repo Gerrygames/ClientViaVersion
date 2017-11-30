@@ -18,6 +18,10 @@ public class Scoreboard extends StoredObject {
 		teams.computeIfAbsent(team, key -> new ArrayList<>()).add(player);
 	}
 
+	public void addTeam(String team) {
+		teams.computeIfAbsent(team, key -> new ArrayList<>());
+	}
+
 	public void removeTeam(String team) {
 		teams.remove(team);
 	}

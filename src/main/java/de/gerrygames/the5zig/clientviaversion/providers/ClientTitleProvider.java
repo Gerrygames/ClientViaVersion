@@ -2,11 +2,10 @@ package de.gerrygames.the5zig.clientviaversion.providers;
 
 import de.gerrygames.the5zig.clientviaversion.main.ClientViaVersion;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.provider.TitleRenderProvider;
+import de.gerrygames.the5zig.clientviaversion.utils.Utils;
 import eu.the5zig.mod.The5zigAPI;
 import eu.the5zig.mod.event.EventHandler;
 import eu.the5zig.mod.event.TickEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
 import us.myles.ViaVersion.api.data.UserConnection;
 
 public class ClientTitleProvider extends TitleRenderProvider {
@@ -57,17 +56,13 @@ public class ClientTitleProvider extends TitleRenderProvider {
 
 	public String getTitle() {
 		String title = this.titles.get(ClientViaVersion.user);
-		if (title!=null && title.startsWith("{")) {
-			title = TextComponent.toLegacyText(ComponentSerializer.parse(title));
-		}
+		title = Utils.jsonToLegacy(title);
 		return title;
 	}
 
 	public String getSubTitle() {
 		String subTitle = this.subTitles.get(ClientViaVersion.user);
-		if (subTitle!=null && subTitle.startsWith("{")) {
-			subTitle = TextComponent.toLegacyText(ComponentSerializer.parse(subTitle));
-		}
+		subTitle = Utils.jsonToLegacy(subTitle);
 		return subTitle;
 	}
 
