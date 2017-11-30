@@ -14,8 +14,6 @@ public class ClassNames1_7_10 {
 		CLASS_NAMES.put("c_NetHandlerLoginClient", "biz");
 		CLASS_NAMES.put("c_NettyCompressionDecoder", "de.gerrygames.the5zig.clientviaversion.netty.CompressionDecoder");
 		CLASS_NAMES.put("c_NettyCompressionEncoder", "de.gerrygames.the5zig.clientviaversion.netty.CompressionEncoder");
-		CLASS_NAMES.put("c_VersionButton", "VersionButton");
-		CLASS_NAMES.put("c_VersionReconnectButton", "VersionReconnectButton");
 
 		CLASS_NAMES.put("f_Entity_entityId", "c");
 		CLASS_NAMES.put("f_EntityPlayer_itemStackMainHand", "f");

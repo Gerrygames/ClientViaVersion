@@ -43,7 +43,7 @@ public class GuiPatcher {
 			Object gui = Class.forName("Variables").getDeclaredMethod("getMinecraftScreen").invoke(The5zigMod.getVars());
 			if (gui==null || prevScreen==gui) return;
 			prevScreen = gui;
-			ButtonManager.buttons.clear();
+			ButtonRegistry.getInstance().clear();
 			if (ClassNames.getGuiMultiplayerClass().isInstance(gui)) {
 				GuiPatcher.patchGuiMultiplayer(gui);
 			} else if (ClassNames.getGuiDisconnectedClass().isInstance(gui)) {
@@ -56,7 +56,7 @@ public class GuiPatcher {
 	}
 
 	public static void patchGuiMultiplayer(Object gui) throws Exception {
-		addButton(gui, ClassNames.getVersionButtonClass().getConstructor(int.class, int.class, int.class, int.class, int.class, String.class).newInstance(420, liquidBouncePresent ? 206 : 8, liquidBouncePresent ? 8 : 6, 60, 20, ClientViaVersion.selected.getName()));
+		addButton(gui, Class.forName("VersionButton").getConstructor(int.class, int.class, int.class, int.class, int.class, String.class).newInstance(420, liquidBouncePresent ? 206 : 8, liquidBouncePresent ? 8 : 6, 60, 20, ClientViaVersion.selected.getName()));
 	}
 
 	private static HashMap<String, Integer> versions = new HashMap<>();
@@ -112,7 +112,7 @@ public class GuiPatcher {
 		int width = (int) ClassNames.getGuiScreenWidthField().get(gui);
 		int height = (int) ClassNames.getGuiScreenHeightField().get(gui);
 		int textHeight = ClientViaVersion.CLIENT_PROTOCOL_VERSION<=5 ? 15 : (int) ClassNames.getGuiDisconnectedTextHeightField().get(gui);
-		addButton(gui, ClassNames.getVersionReconnectButtonClass().getConstructor(int.class, int.class, int.class, int.class, int.class, String.class, ProtocolVersion.class).newInstance(420, width / 2 - 100, Math.min(height / 2 + textHeight / 2 + 9, height - 30) + (liquidBouncePresent ? 85 : 25), 200, 20, "Reconnect with " + protocolVersion.getName() + " Protocol", protocolVersion));
+		addButton(gui, Class.forName("VersionReconnectButton").getConstructor(int.class, int.class, int.class, int.class, int.class, String.class, ProtocolVersion.class).newInstance(420, width / 2 - 100, Math.min(height / 2 + textHeight / 2 + 9, height - 30) + (liquidBouncePresent ? 85 : 25), 200, 20, "Reconnect with " + protocolVersion.getName() + " Protocol", protocolVersion));
 	}
 
 	private static boolean contains(String message, String version) {

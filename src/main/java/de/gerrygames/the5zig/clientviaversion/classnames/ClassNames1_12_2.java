@@ -23,8 +23,6 @@ public class ClassNames1_12_2 {
 		CLASS_NAMES.put("c_RecipeBookClient", "cih");
 		CLASS_NAMES.put("c_ShapedRecipes", "akw");
 		CLASS_NAMES.put("c_ToolMaterial", "a");
-		CLASS_NAMES.put("c_VersionButton", "VersionButton");
-		CLASS_NAMES.put("c_VersionReconnectButton", "VersionReconnectButton");
 
 		CLASS_NAMES.put("f_Entity_entityId", "h");
 		CLASS_NAMES.put("f_EntityPlayer_itemStackMainHand", "bV");

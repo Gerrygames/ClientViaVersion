@@ -14,17 +14,16 @@ public class VersionReconnectButton extends ClientViaVersionButton {
 	}
 
 	@Override
-	public boolean mouseClicked(int mouseX, int mouseY) {
-		boolean clicked = this.isEnabled() && this.isVisible() && mouseX >= this.getX() && mouseY >= this.getY() && mouseX < this.getX() + this.getWidth() && mouseY < this.getY() + this.getHeight();
-		if (clicked) {
-			ClientViaVersion.setProtocol(protocolVersion);
-			Scheduler.runTask(new Runnable() {
-				@Override
-				public void run() {
-					The5zigMod.getVars().joinServer(GuiPatcher.prevScreen, Utils.getLastServerData());
-				}
-			});
-		}
-		return clicked;
+	public void mouseWasClicked(int mouseX, int mouseY) {
+		ClientViaVersion.setProtocol(protocolVersion);
+		Scheduler.runTask(new Runnable() {
+			@Override
+			public void run() {
+				The5zigMod.getVars().joinServer(GuiPatcher.prevScreen, Utils.getLastServerData());
+			}
+		});
 	}
+
+	@Override
+	protected void mouseWasReleased(int mouseX, int mouseY) { }
 }

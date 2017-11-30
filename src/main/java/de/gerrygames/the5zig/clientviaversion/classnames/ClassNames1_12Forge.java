@@ -22,8 +22,6 @@ public class ClassNames1_12Forge {
 		CLASS_NAMES.put("c_NettyCompressionDecoder", "net.minecraft.network.NettyCompressionDecoder");
 		CLASS_NAMES.put("c_NettyCompressionEncoder", "net.minecraft.network.NettyCompressionEncoder");
 		CLASS_NAMES.put("c_ToolMaterial", "ToolMaterial");
-		CLASS_NAMES.put("c_VersionButton", "VersionButtonForge");
-		CLASS_NAMES.put("c_VersionReconnectButton", "VersionReconnectButtonForge");
 
 		CLASS_NAMES.put("f_Entity_entityId", "field_145783_c");
 		CLASS_NAMES.put("f_EntityPlayer_itemStackMainHand", "field_184831_bT");
@@ -35,6 +33,8 @@ public class ClassNames1_12Forge {
 		CLASS_NAMES.put("f_Item_REGISTRY", "field_150901_e");
 		CLASS_NAMES.put("f_ItemStack_item", "field_151002_e");
 		CLASS_NAMES.put("f_ItemSword_toolMaterial", "field_150933_b");
+		CLASS_NAMES.put("f_Minecraft_displayHeight", "field_71440_d");
+		CLASS_NAMES.put("f_Minecraft_displayWidth", "field_71443_c");
 		CLASS_NAMES.put("f_NetworkManager_channel", "field_150746_k");
 		CLASS_NAMES.put("f_NetworkManager_connectionState", "field_150739_c");
 		CLASS_NAMES.put("f_NetworkManager_logger", "field_150735_g");

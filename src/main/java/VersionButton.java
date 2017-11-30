@@ -8,18 +8,22 @@ public class VersionButton extends ClientViaVersionButton {
 	}
 
 	@Override
-	public boolean mouseClicked(int mouseX, int mouseY) {
-		boolean clicked = this.isEnabled() && this.isVisible() && mouseX >= this.getX() && mouseY >= this.getY() && mouseX < this.getX() + this.getWidth() && mouseY < this.getY() + this.getHeight();
-		if (clicked) {
-			int id = ClientViaVersion.supportedVersion.indexOf(ClientViaVersion.selected);
-			if (!Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
-				id = id==0 ? ClientViaVersion.supportedVersion.size()-1 : id-1;
-			} else {
-				id = id==ClientViaVersion.supportedVersion.size()-1 ? 0 : id+1;
-			}
-			ClientViaVersion.setProtocol(ClientViaVersion.supportedVersion.get(id));
-			this.setLabel(ClientViaVersion.selected.getName());
+	public void mouseWasClicked(int mouseX, int mouseY) {
+		int id = ClientViaVersion.supportedVersion.indexOf(ClientViaVersion.selected);
+		if (!Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
+			id = id == 0 ? ClientViaVersion.supportedVersion.size() - 1 : id - 1;
+		} else {
+			id = id == ClientViaVersion.supportedVersion.size() - 1 ? 0 : id + 1;
 		}
-		return clicked;
+		ClientViaVersion.setProtocol(ClientViaVersion.supportedVersion.get(id));
+		this.setLabel(ClientViaVersion.selected.getName());
+	}
+
+	@Override
+	protected void mouseWasReleased(int mouseX, int mouseY) { }
+
+	@Override
+	public String getToolTip() {
+		return "§cUse at own risk!";
 	}
 }

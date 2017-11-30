@@ -13,8 +13,6 @@ public class ClassNames1_8_9 {
 		CLASS_NAMES.put("c_NetHandlerLoginClient", "bcx");
 		CLASS_NAMES.put("c_NettyCompressionDecoder", "ei");
 		CLASS_NAMES.put("c_NettyCompressionEncoder", "ej");
-		CLASS_NAMES.put("c_VersionButton", "VersionButton");
-		CLASS_NAMES.put("c_VersionReconnectButton", "VersionReconnectButton");
 
 		CLASS_NAMES.put("f_Entity_entityId", "c");
 		CLASS_NAMES.put("f_EntityPlayer_itemStackMainHand", "g");

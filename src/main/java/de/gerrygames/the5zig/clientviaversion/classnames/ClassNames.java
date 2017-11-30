@@ -130,14 +130,6 @@ public class ClassNames {
 		return getClass("c_NettyCompressionDecoder");
 	}
 
-	public static Class getVersionButtonClass() {
-		return getClass("c_VersionButton");
-	}
-
-	public static Class getVersionReconnectButtonClass() {
-		return getClass("c_VersionReconnectButton");
-	}
-
 	public static Class getGuiMultiplayerClass() {
 		return getClass("c_GuiMultiplayer");
 	}

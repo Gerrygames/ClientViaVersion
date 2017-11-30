@@ -14,8 +14,6 @@ public class ClassNames1_7_10Forge {
 		CLASS_NAMES.put("c_NetHandlerLoginClient", "net.minecraft.client.network.NetHandlerLoginClient");
 		CLASS_NAMES.put("c_NettyCompressionDecoder", "de.gerrygames.the5zig.clientviaversion.netty.CompressionDecoder");
 		CLASS_NAMES.put("c_NettyCompressionEncoder", "de.gerrygames.the5zig.clientviaversion.netty.CompressionEncoder");
-		CLASS_NAMES.put("c_VersionButton", "VersionButtonForge");
-		CLASS_NAMES.put("c_VersionReconnectButton", "VersionReconnectButtonForge");
 
 		CLASS_NAMES.put("f_Entity_entityId", "field_145783_c");
 		CLASS_NAMES.put("f_EntityPlayer_itemStackMainHand", "field_71074_e");
@@ -24,6 +22,8 @@ public class ClassNames1_7_10Forge {
 		CLASS_NAMES.put("f_GuiScreen_height", "field_146295_m");
 		CLASS_NAMES.put("f_GuiScreen_width", "field_146294_l");
 		CLASS_NAMES.put("f_ItemStack_item", "field_151002_e");
+		CLASS_NAMES.put("f_Minecraft_displayHeight", "field_71440_d");
+		CLASS_NAMES.put("f_Minecraft_displayWidth", "field_71443_c");
 		CLASS_NAMES.put("f_NetworkManager_channel", "field_150746_k");
 		CLASS_NAMES.put("f_NetworkManager_connectionState", "field_150739_c");
 		CLASS_NAMES.put("f_NetworkManager_logger", "field_150735_g");
