@@ -10,6 +10,8 @@
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <minecraft.version>1.12.2</minecraft.version>
+        <fivezig.version>3.12.4</fivezig.version>
     </properties>
 
     <repositories>
@@ -69,35 +71,35 @@
             <artifactId>The5zigMod</artifactId>
             <version>LATEST</version>
             <scope>system</scope>
-            <systemPath>F:/IntelliJ/lib/The 5zig Mod v3.12.4 for Minecraft 1.12.2.jar</systemPath>
+            <systemPath>${project.basedir}/lib/The 5zig Mod v${fivezig.version} for Minecraft ${minecraft.version}.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.mojang</groupId>
             <artifactId>authlib</artifactId>
             <version>LATEST</version>
             <scope>system</scope>
-            <systemPath>F:/IntelliJ/lib/authlib-1.5.25.jar</systemPath>
+            <systemPath>${project.basedir}/lib/authlib.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>net.minecraft</groupId>
             <artifactId>launchwrapper</artifactId>
             <version>LATEST</version>
             <scope>system</scope>
-            <systemPath>F:/IntelliJ/lib/launchwrapper-1.12.jar</systemPath>
+            <systemPath>${project.basedir}/lib/launchwrapper.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>net.minecraftforge</groupId>
             <artifactId>forge</artifactId>
             <version>LATEST</version>
             <scope>system</scope>
-            <systemPath>F:/IntelliJ/lib/forge1.12.1.jar</systemPath>
+            <systemPath>${project.basedir}/lib/forge${minecraft.version}.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.mojang</groupId>
             <artifactId>minecraft</artifactId>
             <version>LATEST</version>
             <scope>system</scope>
-            <systemPath>C:/Users/Gero/AppData/Roaming/.minecraft/versions/1.12.2/1.12.2.jar</systemPath>
+            <systemPath>${user.home}/AppData/Roaming/.minecraft/versions/${minecraft.version}/${minecraft.version}.jar</systemPath>
         </dependency>
     </dependencies>
 
@@ -142,7 +144,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <file>VersionTemplate.java</file>
+                    <file>VersionTemplate.txt</file>
                     <outputFile>src/main/java/de/gerrygames/the5zig/clientviaversion/Version.java</outputFile>
                     <replacements>
                         <replacement>
@@ -154,51 +156,6 @@
                             <value>${project.version}</value>
                         </replacement>
                     </replacements>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.0.2</version>
-                <executions>
-                    <execution>
-                        <id>copy</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <artifactItems>
-                        <artifactItem>
-                            <groupId>de.gerrygames</groupId>
-                            <artifactId>ClientViaVersion</artifactId>
-                            <version>${project.version}</version>
-                            <type>jar</type>
-                            <overWrite>true</overWrite>
-                            <outputDirectory>C:\Users\Gero\AppData\Roaming\.minecraft\the5zigmod\plugins</outputDirectory>
-                            <destFileName>ClientViaVersion.jar</destFileName>
-                        </artifactItem>
-                        <artifactItem>
-                            <groupId>de.gerrygames</groupId>
-                            <artifactId>ClientViaVersion</artifactId>
-                            <version>${project.version}</version>
-                            <type>jar</type>
-                            <overWrite>true</overWrite>
-                            <outputDirectory>C:\Users\Gero\AppData\Roaming\.minecraft1.8.9\the5zigmod\plugins</outputDirectory>
-                            <destFileName>ClientViaVersion.jar</destFileName>
-                        </artifactItem>
-                        <artifactItem>
-                            <groupId>de.gerrygames</groupId>
-                            <artifactId>ClientViaVersion</artifactId>
-                            <version>${project.version}</version>
-                            <type>jar</type>
-                            <overWrite>true</overWrite>
-                            <outputDirectory>C:\Users\Gero\AppData\Roaming\.minecraft1.fucking7\the5zigmod\plugins</outputDirectory>
-                            <destFileName>ClientViaVersion.jar</destFileName>
-                        </artifactItem>
-                    </artifactItems>
                 </configuration>
             </plugin>
         </plugins>
