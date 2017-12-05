@@ -1,11 +1,14 @@
 **General Information**
+
 This is a plugin for [The 5zig Mod](https://5zig.net) implementing [ViaVersion](https://github.com/MylesIsCool/ViaVersion) and [ViaBackwards](https://github.com/Matsv/ViaBackwards).
 This allows you to connect to Minecraft server which protocol (version) does not match/support your client version.
 
 **Supported client versions**
+
 1.7.10, 1.8.9, 1.12, 1.12.2
 
 **Supported server versions / protocols**
+
 client version(s) **-** server version(s) (vv - by [ViaVersion](https://github.com/MylesIsCool/ViaVersion), vb - by [ViaBackwards](https://github.com/Matsv/ViaBackwards), cvv by ClientViaVersion/Me)
 
 1.12.2 **-** 1.12.1-1.9 (vv), 1.8.x-1.7 (cvv, vv)
@@ -14,10 +17,12 @@ client version(s) **-** server version(s) (vv - by [ViaVersion](https://github.c
 1.7.10 **-** 1.12.2-1.9 (cvv, vb), 1.8.x (cvv)
 
 **WARNING**
+
 I can not guarantee that this plugin is allowed on every (or even any) server. **USE AT OWN RISK**
 This plugin may cause problems with anti cheat plugins.
 
 **Known informations for some servers**
+
 Plugin is not allowed and does yield in an automatical ban on:
 -timolia.de
 -play.epicube.de
