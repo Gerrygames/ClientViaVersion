@@ -18,9 +18,9 @@ I can not guarantee that this plugin is allowed on every (or even any) server. *
 This plugin may cause problems with anti cheat plugins.
 
 **Known informations for some servers**  
-Plugin is not allowed and does yield in an automatical ban on:  
+Plugin is not allowed and does yield in an automatic ban on:  
 -timolia.de  
--play.epicube.de  
+-play.epicube.fr  
 
 Plugin is allowed but an unban is not guaranteed **if** you get banned on:  
 -gommehd.net  
