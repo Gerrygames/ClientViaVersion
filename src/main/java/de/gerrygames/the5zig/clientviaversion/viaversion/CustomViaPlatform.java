@@ -1,7 +1,6 @@
 package de.gerrygames.the5zig.clientviaversion.viaversion;
 
 import de.gerrygames.the5zig.clientviaversion.Version;
-import de.gerrygames.the5zig.clientviaversion.main.ClientViaVersion;
 import de.gerrygames.the5zig.clientviaversion.utils.Scheduler;
 import eu.the5zig.mod.The5zigAPI;
 import eu.the5zig.mod.The5zigMod;

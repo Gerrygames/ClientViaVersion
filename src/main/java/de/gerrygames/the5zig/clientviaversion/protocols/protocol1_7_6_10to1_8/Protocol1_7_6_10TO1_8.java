@@ -1464,16 +1464,22 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						TitleRenderProvider titleRenderProvider = Via.getManager().getProviders().get(TitleRenderProvider.class);
 						int action = packetWrapper.read(Type.VAR_INT);
-						if (action==0) {
-							titleRenderProvider.setTitle(packetWrapper.user(), packetWrapper.read(Type.STRING));
-						} else if (action==1) {
-							titleRenderProvider.setSubTitle(packetWrapper.user(), packetWrapper.read(Type.STRING));
-						} else if (action==2) {
-							titleRenderProvider.setTimings(packetWrapper.user(), packetWrapper.read(Type.INT), packetWrapper.read(Type.INT), packetWrapper.read(Type.INT));
-						} else if (action==3) {
-							titleRenderProvider.hide(packetWrapper.user());
-						} else if (action==4) {
-							titleRenderProvider.reset(packetWrapper.user());
+						switch (action) {
+							case 0:
+								titleRenderProvider.setTitle(packetWrapper.user(), packetWrapper.read(Type.STRING));
+								break;
+							case 1:
+								titleRenderProvider.setSubTitle(packetWrapper.user(), packetWrapper.read(Type.STRING));
+								break;
+							case 2:
+								titleRenderProvider.setTimings(packetWrapper.user(), packetWrapper.read(Type.INT), packetWrapper.read(Type.INT), packetWrapper.read(Type.INT));
+								break;
+							case 3:
+								titleRenderProvider.hide(packetWrapper.user());
+								break;
+							case 4:
+								titleRenderProvider.reset(packetWrapper.user());
+								break;
 						}
 						packetWrapper.cancel();
 					}
@@ -1698,14 +1704,18 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						int animation = packetWrapper.read(Type.BYTE);  //Animation
 						if (animation==1) return;
 						packetWrapper.cancel();
-						if (animation==104) {
-							animation = 0;
-						} else if (animation==105) {
-							animation = 1;
-						} else if (animation==3) {
-							animation = 2;
-						} else {
-							return;
+						switch (animation) {
+							case 104:
+								animation = 0;
+								break;
+							case 105:
+								animation = 1;
+								break;
+							case 3:
+								animation = 2;
+								break;
+							default:
+								return;
 						}
 						PacketWrapper entityAction = new PacketWrapper(0x0B, null, packetWrapper.user());
 						entityAction.write(Type.VAR_INT, entityId);

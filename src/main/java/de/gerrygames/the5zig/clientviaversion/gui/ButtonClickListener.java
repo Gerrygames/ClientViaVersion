@@ -1,7 +1,6 @@
 package de.gerrygames.the5zig.clientviaversion.gui;
 
 import de.gerrygames.the5zig.clientviaversion.classnames.ClassNames;
-import de.gerrygames.the5zig.clientviaversion.main.ClientViaVersion;
 import eu.the5zig.mod.The5zigMod;
 import org.lwjgl.input.Mouse;
 

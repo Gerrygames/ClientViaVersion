@@ -57,8 +57,4 @@ public class ClassNames1_12Forge {
 		CLASS_NAMES.put("m_ITextComponent_getFormattedText", "func_150254_d");
 		CLASS_NAMES.put("m_World_getEntityByUUID", "func_152378_a");
 	}
-
-	private boolean test() {
-		return false;
-	}
 }

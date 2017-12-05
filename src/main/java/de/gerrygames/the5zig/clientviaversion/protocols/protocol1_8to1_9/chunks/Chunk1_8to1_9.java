@@ -7,7 +7,7 @@ import us.myles.ViaVersion.api.minecraft.chunks.NibbleArray;
 
 public class Chunk1_8to1_9 {
 	public ExtendedBlockStorage[] storageArrays = new ExtendedBlockStorage[16];
-	public byte[] blockBiomeArray = new byte[256];
+	public byte[] blockBiomeArray;
 	private boolean skyLight;
 	private int primaryBitMask;
 	private boolean groundUp;

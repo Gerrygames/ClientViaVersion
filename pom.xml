@@ -88,13 +88,6 @@
             <systemPath>${project.basedir}/lib/launchwrapper.jar</systemPath>
         </dependency>
         <dependency>
-            <groupId>net.minecraftforge</groupId>
-            <artifactId>forge</artifactId>
-            <version>LATEST</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/forge${minecraft.version}.jar</systemPath>
-        </dependency>
-        <dependency>
             <groupId>com.mojang</groupId>
             <artifactId>minecraft</artifactId>
             <version>LATEST</version>

@@ -1,0 +1,6 @@
+{
+  "pack": {
+    "pack_format": 3,
+    "description": "Enables blocking in 1.12+ with ClientViaVersion"
+  }
+}
