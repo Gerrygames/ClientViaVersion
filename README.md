@@ -10,10 +10,10 @@ This allows you to connect to Minecraft server which protocol (version) does not
 **Supported server versions / protocols**  
 client version(s) **-** server version(s) (vv - by [ViaVersion](https://github.com/MylesIsCool/ViaVersion), vb - by [ViaBackwards](https://github.com/Matsv/ViaBackwards), cvv - by ClientViaVersion/Me)
 
-1.12.2 **-** 1.12.1-1.9 (vv), 1.8.x-1.7 (cvv, vv)  
-1.12 **-** 1.12.1-1.12.2 (vb), 1.11.2-1.9 (vv), 1.8.x-1.7 (cvv, vv)  
-1.8.9 **-** 1.12.2-1.10 (cvv, vb, vv), 1.9.4-1.9.1 (cvv, vv), 1.9 (cvv), 1.7.10-1.7 (cvv)  
-1.7.10 **-** 1.12.2-1.9 (cvv, vb), 1.8.x (cvv)  
+1.12.2 **-** 1.12.1-1.8.x (vv), 1.7.x (cvv, vv)  
+1.12 **-** 1.12.1-1.12.2 (vb), 1.11.2-1.8.x (vv), 1.7.x (cvv, vv)  
+1.8.9 **-** 1.12.2-1.10 (cvv, vb, vv), 1.9.4-1.9.1 (cvv, vv), 1.9 (cvv), 1.7.x (cvv)  
+1.7.10 **-** 1.12.2-1.10 (cvv, vb, vv), 1.9.4-1.9.1 (cvv, vv), 1.9-1.8.x (cvv)  
 
 **WARNING**  
 I can not guarantee that this plugin is allowed on every (or even any) server. This plugin may cause problems with anti cheat plugins. **USE AT OWN RISK**
