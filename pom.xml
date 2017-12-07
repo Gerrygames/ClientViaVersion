@@ -7,11 +7,38 @@
     <groupId>de.gerrygames</groupId>
     <artifactId>ClientViaVersion</artifactId>
     <version>2.0-beta</version>
+
+    <profiles>
+        <profile>
+            <id>windows_profile</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+            </activation>
+            <properties>
+                <minecraft.dir>${user.home}/AppData/Roaming/.minecraft</minecraft.dir>
+            </properties>
+        </profile>
+        <profile>
+            <id>linux_profile</id>
+            <activation>
+                <os>
+                    <family>Linux</family>
+                </os>
+            </activation>
+            <properties>
+                <minecraft.dir>${user.home}/.minecraft</minecraft.dir>
+            </properties>
+        </profile>
+    </profiles>
+
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <minecraft.version>1.12.2</minecraft.version>
         <fivezig.version>3.12.4</fivezig.version>
+        <minecraft.libraries>${minecraft.dir}/libraries</minecraft.libraries>
     </properties>
 
     <repositories>
@@ -25,7 +52,7 @@
         <dependency>
             <groupId>us.myles</groupId>
             <artifactId>viaversion</artifactId>
-            <version>LATEST</version>
+            <version>1.4.0-17w45b</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -71,28 +98,28 @@
             <artifactId>The5zigMod</artifactId>
             <version>LATEST</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/The 5zig Mod v${fivezig.version} for Minecraft ${minecraft.version}.jar</systemPath>
+            <systemPath>${minecraft.libraries}/eu/the5zig/The5zigMod/${minecraft.version}_${fivezig.version}/The5zigMod-${minecraft.version}_${fivezig.version}.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.mojang</groupId>
             <artifactId>authlib</artifactId>
             <version>LATEST</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/authlib.jar</systemPath>
+            <systemPath>${minecraft.libraries}/com/mojang/authlib/1.5.25/authlib-1.5.25.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>net.minecraft</groupId>
             <artifactId>launchwrapper</artifactId>
             <version>LATEST</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/launchwrapper.jar</systemPath>
+            <systemPath>${minecraft.libraries}/net/minecraft/launchwrapper/1.7/launchwrapper-1.7.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.mojang</groupId>
             <artifactId>minecraft</artifactId>
             <version>LATEST</version>
             <scope>system</scope>
-            <systemPath>${user.home}/AppData/Roaming/.minecraft/versions/${minecraft.version}/${minecraft.version}.jar</systemPath>
+            <systemPath>${minecraft.dir}/versions/${minecraft.version}/${minecraft.version}.jar</systemPath>
         </dependency>
     </dependencies>
 
