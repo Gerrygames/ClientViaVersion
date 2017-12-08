@@ -3,7 +3,6 @@ package de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.chunks.ChunkPacketTransformer;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.items.ItemReplacement;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.items.ItemRewriter;
-import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.map.MapPacketCache;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.provider.TitleRenderProvider;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.storage.EntityTracker;
@@ -31,7 +30,6 @@ import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueCreator;
-import us.myles.ViaVersion.api.remapper.ValueReader;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.CustomByteType;
 import us.myles.ViaVersion.api.type.types.version.Types1_8;
@@ -47,15 +45,6 @@ import java.util.List;
 import java.util.UUID;
 
 public class Protocol1_7_6_10TO1_8 extends Protocol {
-	private static ValueReader positiontoxyz = new ValueReader<Position>() {
-		@Override
-		public Position read(PacketWrapper packetWrapper) throws Exception {
-			long x = packetWrapper.read(Type.INT);
-			long y = packetWrapper.read(Type.INT);
-			long z = packetWrapper.read(Type.INT);
-			return new Position(x, y, z);
-		}
-	};
 
 	@Override
 	protected void registerPackets() {
@@ -201,13 +190,6 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					public void write(PacketWrapper packetWrapper) throws Exception {
 						PlayerPosition playerPosition = packetWrapper.user().get(PlayerPosition.class);
 						packetWrapper.write(Type.BOOLEAN, playerPosition.isOnGround());
-						//packetWrapper.write(Type.BOOLEAN, true);
-					}
-				});
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						PlayerPosition playerPosition = packetWrapper.user().get(PlayerPosition.class);
 					}
 				});
 			}
@@ -338,6 +320,8 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 							packetWrapper.set(Type.INT, 0, x);
 							packetWrapper.set(Type.INT, 2, z);
 							packetWrapper.set(Type.BYTE, 2, yaw);
+						} else if (typeID==78) {
+							packetWrapper.cancel();
 						}
 
 					}
@@ -347,10 +331,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					public void handle(final PacketWrapper packetWrapper) throws Exception {
 						final int entityID = packetWrapper.get(Type.VAR_INT, 0);
 						final int typeID = packetWrapper.get(Type.BYTE, 0);
-						if (typeID==78) {
-							packetWrapper.cancel();
-							return;
-						}
+						if (typeID==78) return;
 						final EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 						final Entity1_10Types.EntityType type = Entity1_10Types.getTypeFromId(typeID, true);
 						tracker.getClientEntityTypes().put(entityID, type);
@@ -1680,7 +1661,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						long z = packetWrapper.read(Type.INT);
 						packetWrapper.write(Type.POSITION, new Position(x, y, z));
 
-						byte direction = packetWrapper.passthrough(Type.BYTE);  //Direction
+						packetWrapper.passthrough(Type.BYTE);  //Direction
 						Item item = packetWrapper.read(Types1_7_6_10.COMPRESSED_NBT_ITEM);
 						item = ItemRewriter.toServer(item);
 						packetWrapper.write(Type.ITEM, item);
@@ -1970,7 +1951,6 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 		userConnection.put(new PlayerPosition(userConnection));
 		userConnection.put(new GameProfileStorage(userConnection));
 		userConnection.put(new ClientChunks(userConnection));
-		userConnection.put(new MapPacketCache(userConnection));
 		userConnection.put(new LoadedChunks(userConnection));
 		userConnection.put(new Scoreboard(userConnection));
 	}
@@ -2071,7 +2051,6 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 
 		static {
 			Particle[] particles = values();
-			int var1 = particles.length;
 
 			for (Particle particle : particles) {
 				particleMap.put(particle.name, particle);
