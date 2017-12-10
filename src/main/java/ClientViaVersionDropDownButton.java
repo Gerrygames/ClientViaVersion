@@ -6,7 +6,7 @@ public class ClientViaVersionDropDownButton extends ClientViaVersionButton {
 	private boolean droppedDown  = false;
 	private int elementHeight;
 	private int originalHeight;
-	private List<DropDownElement> elements;
+	protected List<DropDownElement> elements;
 	private DropDownElement selected;
 
 	public ClientViaVersionDropDownButton(int id, int x, int y, int width, int height, List<DropDownElement> elements, int selected) {

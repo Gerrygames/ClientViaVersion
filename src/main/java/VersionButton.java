@@ -1,6 +1,7 @@
 import de.gerrygames.the5zig.clientviaversion.main.ClientViaVersion;
 import eu.the5zig.mod.gui.Gui;
 
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 public class VersionButton extends ClientViaVersionDropDownButton {
@@ -19,6 +20,7 @@ public class VersionButton extends ClientViaVersionDropDownButton {
 						.collect(Collectors.toList()),
 				ClientViaVersion.supportedVersion.indexOf(ClientViaVersion.selected)
 		);
+		Collections.reverse(elements);
 	}
 
 	private float lastX = 0;
