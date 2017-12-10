@@ -8,14 +8,17 @@ import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_9.items.I
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_9.metadata.MetadataRewriter;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_9.sound.SoundRemapper;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_9.storage.BlockPlaceDestroyTracker;
+import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_9.storage.BossBarStorage;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_9.storage.Cooldown;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_9.storage.EntityTracker;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_9.storage.Levitation;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_9.storage.PlayerPosition;
+import de.gerrygames.the5zig.clientviaversion.utils.Utils;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_10Types;
+import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.protocol.Protocol;
@@ -297,6 +300,23 @@ public class Protocol1_8TO1_9 extends Protocol {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						packetWrapper.cancel();
+						UUID uuid = packetWrapper.read(Type.UUID);
+						int action = packetWrapper.read(Type.VAR_INT);
+						BossBarStorage bossBarStorage = packetWrapper.user().get(BossBarStorage.class);
+						if (action==0) {
+							bossBarStorage.add(uuid, packetWrapper.read(Type.STRING), packetWrapper.read(Type.FLOAT));
+							packetWrapper.read(Type.VAR_INT);
+							packetWrapper.read(Type.VAR_INT);
+							packetWrapper.read(Type.UNSIGNED_BYTE);
+						} else if (action==1) {
+							bossBarStorage.remove(uuid);
+						} else if (action==2) {
+							bossBarStorage.updateHealth(uuid, packetWrapper.read(Type.FLOAT));
+						} else if (action==3) {
+							String title = packetWrapper.read(Type.STRING);
+							title = Utils.jsonToLegacy(title);
+							bossBarStorage.updateTitle(uuid, title);
+						}
 					}
 				});
 			}
@@ -755,6 +775,13 @@ public class Protocol1_8TO1_9 extends Protocol {
 						packetWrapper.user().get(EntityTracker.class).setPlayerGamemode(packetWrapper.get(Type.UNSIGNED_BYTE, 1));
 					}
 				});
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						packetWrapper.user().get(BossBarStorage.class).updateLocation();
+						packetWrapper.user().get(BossBarStorage.class).changeWorld();
+					}
+				});
 			}
 		});
 
@@ -928,7 +955,21 @@ public class Protocol1_8TO1_9 extends Protocol {
 
 		this.registerOutgoing(State.PLAY, 0x42, 0x3C);  //Update Score
 
-		this.registerOutgoing(State.PLAY, 0x43, 0x05);  //Spawn Position
+		this.registerOutgoing(State.PLAY, 0x43, 0x05, new PacketRemapper() {  //Spawn Position
+			@Override
+			public void registerMap() {
+				map(Type.POSITION);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						Position position = packetWrapper.get(Type.POSITION, 0);
+						PlayerPosition playerPosition = packetWrapper.user().get(PlayerPosition.class);
+						playerPosition.setPos(position.getX(), position.getY(), position.getZ());
+						packetWrapper.user().get(BossBarStorage.class).updateLocation();
+					}
+				});
+			}
+		});
 
 		this.registerOutgoing(State.PLAY, 0x44, 0x03);  //Update Time
 
@@ -1100,6 +1141,12 @@ public class Protocol1_8TO1_9 extends Protocol {
 						}
 					}
 				});
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						packetWrapper.user().get(BossBarStorage.class).updateLocation();
+					}
+				});
 			}
 		});
 
@@ -1121,6 +1168,12 @@ public class Protocol1_8TO1_9 extends Protocol {
 						if (tracker.isInsideVehicle(playerId)) {
 							tracker.sendVehicleMove(pos);
 						}
+					}
+				});
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						packetWrapper.user().get(BossBarStorage.class).updateLocation();
 					}
 				});
 			}
@@ -1148,6 +1201,12 @@ public class Protocol1_8TO1_9 extends Protocol {
 						if (tracker.isInsideVehicle(playerId)) {
 							tracker.sendVehicleMove(pos);
 						}
+					}
+				});
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						packetWrapper.user().get(BossBarStorage.class).updateLocation();
 					}
 				});
 			}
@@ -1389,5 +1448,6 @@ public class Protocol1_8TO1_9 extends Protocol {
 		userConnection.put(new PlayerPosition(userConnection));
 		userConnection.put(new Cooldown(userConnection));
 		userConnection.put(new BlockPlaceDestroyTracker(userConnection));
+		userConnection.put(new BossBarStorage(userConnection));
 	}
 }
