@@ -1,7 +1,9 @@
 package de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.items;
 
+import de.gerrygames.the5zig.clientviaversion.utils.Utils;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
+import us.myles.viaversion.libs.opennbt.tag.builtin.ListTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.ShortTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
 
@@ -25,6 +27,20 @@ public class ItemRewriter {
 			viaVersionTag.put(new StringTag("displayName", (String) display.get("Name").getValue()));
 		}
 
+		if (item.getId()==387) {
+			ListTag pages = item.getTag().get("pages");
+			ListTag oldPages = new ListTag("pages", StringTag.class);
+			viaVersionTag.put(oldPages);
+
+			for (int i = 0; i<pages.size(); i++) {
+				StringTag page = pages.get(i);
+				String value = page.getValue();
+				oldPages.add(new StringTag(page.getName(), value));
+				value = Utils.jsonToLegacy(value);
+				page.setValue(value);
+			}
+		}
+
 		ItemReplacement.toClient(item);
 
 		return item;
@@ -36,7 +52,6 @@ public class ItemRewriter {
 		CompoundTag tag = item.getTag();
 
 		 if (tag==null || !item.getTag().contains("ClientViaVersion1_7_6to1_8")) return item;
-
 
 		CompoundTag viaVersionTag = tag.remove("ClientViaVersion1_7_6to1_8");
 
@@ -51,6 +66,12 @@ public class ItemRewriter {
 			else name.setValue((String) viaVersionTag.get("displayName").getValue());
 		} else if (tag.contains("display")) {
 			((CompoundTag)tag.get("display")).remove("Name");
+		}
+
+		if (item.getId()==387) {
+			ListTag oldPages = viaVersionTag.get("pages");
+			tag.remove("pages");
+			tag.put(oldPages);
 		}
 
 		return item;
