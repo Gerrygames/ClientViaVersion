@@ -722,22 +722,6 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						int chunkX = packetWrapper.get(Type.INT, 0) >> 4;
-						int chunkZ = packetWrapper.get(Type.INT, 1) >> 4;
-
-						LoadedChunks loadedChunks = packetWrapper.user().get(LoadedChunks.class);
-						if (!loadedChunks.isLoaded(chunkX, chunkZ)) {
-							try {
-								ChunkPacketTransformer.getEmptyChunkPacket(chunkX, chunkZ, packetWrapper.user())
-										.send(Protocol1_7_6_10TO1_8.class, true, true);
-							} catch (Exception ex) {ex.printStackTrace();return;}
-							loadedChunks.load(chunkX, chunkZ);
-						}
-					}
-				});
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
 						int data = packetWrapper.read(Type.VAR_INT);
 
 						int blockId = data >> 4;

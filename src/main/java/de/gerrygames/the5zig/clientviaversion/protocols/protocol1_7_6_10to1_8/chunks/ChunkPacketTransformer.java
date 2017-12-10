@@ -24,7 +24,7 @@ public class ChunkPacketTransformer {
 		boolean isUnloadPacket = groundUp && primaryBitMask == 0;
 
 		LoadedChunks loadedChunks = packetWrapper.user().get(LoadedChunks.class);
-		if (loadedChunks.isLoaded(chunkX, chunkZ)) {
+		if (loadedChunks.isLoaded(chunkX, chunkZ) && groundUp) {
 			try {
 				getUnloadPacket(chunkX, chunkZ, packetWrapper.user())
 						.send(Protocol1_7_6_10TO1_8.class, true, true);
