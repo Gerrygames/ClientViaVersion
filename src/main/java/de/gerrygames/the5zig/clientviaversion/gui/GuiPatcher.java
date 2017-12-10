@@ -56,7 +56,7 @@ public class GuiPatcher {
 	}
 
 	public static void patchGuiMultiplayer(Object gui) throws Exception {
-		addButton(gui, Class.forName("VersionButton").getConstructor(int.class, int.class, int.class, int.class, int.class).newInstance(420, liquidBouncePresent ? 206 : 8, liquidBouncePresent ? 8 : 6, 60, 20));
+		addButton(gui, Class.forName("VersionButton").getConstructor(int.class, int.class, int.class, int.class).newInstance(420, liquidBouncePresent ? 206 : 8, liquidBouncePresent ? 8 : 6, 60));
 	}
 
 	private static HashMap<String, Integer> versions = new HashMap<>();

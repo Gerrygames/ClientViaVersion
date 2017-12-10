@@ -6,13 +6,14 @@ import java.util.stream.Collectors;
 
 public class VersionButton extends ClientViaVersionDropDownButton {
 
-	public VersionButton(int id, int x, int y, int width, int height) {
+	public VersionButton(int id, int x, int y, int width) {
 		// :^)
 		super(id,
 				x,
 				y,
 				width,
-				height,
+				20,
+				15,
 				ClientViaVersion.supportedVersion
 						.stream()
 				        .map(protocolVersion -> new DropDownElement(protocolVersion.getName(),

@@ -10,8 +10,12 @@ public class ClientViaVersionDropDownButton extends ClientViaVersionButton {
 	private DropDownElement selected;
 
 	public ClientViaVersionDropDownButton(int id, int x, int y, int width, int height, List<DropDownElement> elements, int selected) {
+		this(id, x, y, width, height, height, elements, selected);
+	}
+
+	public ClientViaVersionDropDownButton(int id, int x, int y, int width, int height, int elementHeight, List<DropDownElement> elements, int selected) {
 		super(id, x, y, width, height, elements.get(selected).getDisplayName());
-		this.elementHeight = height;
+		this.elementHeight = elementHeight;
 		this.originalHeight = height;
 		this.elements = elements;
 		this.selected = elements.get(selected);
@@ -75,7 +79,7 @@ public class ClientViaVersionDropDownButton extends ClientViaVersionButton {
 
 				Gui.drawRect(this.getX(), top, this.getX()+this.getWidth(), top+elementHeight+1, color);
 				Gui.drawRectInline(this.getX(), top, this.getX()+this.getWidth(), top+elementHeight+1, outlineColor);
-				Gui.drawScaledCenteredString(element.getDisplayName(), this.getX() + this.getWidth() / 2, top + elementHeight / 2 - (int)(scale * 4), 1.0f);
+				Gui.drawScaledCenteredString(element.getDisplayName(), this.getX() + this.getWidth() / 2, top + elementHeight / 2 - (int)(scale * 3), 1.0f);
 			}
 		}
 		scale = 3.0f;
