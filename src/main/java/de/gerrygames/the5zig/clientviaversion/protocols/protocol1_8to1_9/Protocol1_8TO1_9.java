@@ -304,7 +304,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 						int action = packetWrapper.read(Type.VAR_INT);
 						BossBarStorage bossBarStorage = packetWrapper.user().get(BossBarStorage.class);
 						if (action==0) {
-							bossBarStorage.add(uuid, packetWrapper.read(Type.STRING), packetWrapper.read(Type.FLOAT));
+							bossBarStorage.add(uuid, Utils.jsonToLegacy(packetWrapper.read(Type.STRING)), packetWrapper.read(Type.FLOAT));
 							packetWrapper.read(Type.VAR_INT);
 							packetWrapper.read(Type.VAR_INT);
 							packetWrapper.read(Type.UNSIGNED_BYTE);

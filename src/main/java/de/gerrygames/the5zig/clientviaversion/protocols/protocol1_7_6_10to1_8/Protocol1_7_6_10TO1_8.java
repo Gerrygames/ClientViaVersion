@@ -1225,7 +1225,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 									packet.send(Protocol1_7_6_10TO1_8.class);*/
 								}
 							} else if (action==4) {
-								GameProfileStorage.GameProfile gameProfile = gameProfileStorage.get(uuid);
+								GameProfileStorage.GameProfile gameProfile = gameProfileStorage.remove(uuid);
 								if (gameProfile==null) continue;
 
 								PacketWrapper packet = new PacketWrapper(0x38, null, packetWrapper.user());

@@ -35,6 +35,10 @@ public class GameProfileStorage extends StoredObject {
 		return properties.get(uuid);
 	}
 
+	public GameProfile remove(UUID uuid) {
+		return properties.remove(uuid);
+	}
+
 
 	public static class GameProfile {
 		public String name;
