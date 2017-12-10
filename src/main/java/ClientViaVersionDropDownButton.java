@@ -72,8 +72,8 @@ public class ClientViaVersionDropDownButton extends ClientViaVersionButton {
 				Gui.drawScaledCenteredString(element.getDisplayName(), this.getX() + this.getWidth() / 2, top + elementHeight / 2 - (int)(scale * 4), 1.0f);
 			}
 		}
-		scale = 2.5f;
-		Gui.drawScaledCenteredString(droppedDown ? "▲" : "▼", this.getX()+this.getWidth()-8, this.getY() + originalHeight / 2 - (int)(scale * 4), scale);
+		scale = 3.0f;
+		Gui.drawScaledCenteredString(droppedDown ? "⇑" : "⇓", this.getX()+this.getWidth()-8, this.getY() + originalHeight / 2 - (int)(scale * 4), scale);
 	}
 
 	private int abgr(int a, int r, int g, int b) {

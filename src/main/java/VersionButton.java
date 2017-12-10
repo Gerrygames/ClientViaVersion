@@ -26,14 +26,13 @@ public class VersionButton extends ClientViaVersionDropDownButton {
 	private static final float drag = 0.5f;
 	private static final String toolTip = "§cUse at own risk!";
 	@Override
-	protected boolean onPreDraw(int mouseX, int mouseY) {
-		boolean shouldDraw = super.onPreDraw(mouseX, mouseY);
+	protected void onPostDraw(int mouseX, int mouseY) {
+		super.onPostDraw(mouseX, mouseY);
 		lastX = lastX + (((float)mouseX) - lastX) * drag;
 		lastY = lastY + (((float)mouseY) - lastY) * drag;
 
 		if (isHovered(mouseX, mouseY)) {
 			Gui.drawScaledString(toolTip, lastX+5, lastY, 1.1f);
 		}
-		return shouldDraw;
 	}
 }
