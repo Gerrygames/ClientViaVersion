@@ -86,7 +86,7 @@ public class ButtonPatcher implements IClassTransformer {
 		Label l4 = new Label();
 		mv.visitLabel(l4);
 		mv.visitLocalVariable("this", "LClientViaVersionButton;", null, l0, l4, 0);
-		mv.visitLocalVariable("mc", "Lbib;", null, l0, l4, 1);
+		mv.visitLocalVariable("mc", "L" + minecraftClassName + ";", null, l0, l4, 1);
 		mv.visitLocalVariable("mouseX", "I", null, l0, l4, 2);
 		mv.visitLocalVariable("mouseY", "I", null, l0, l4, 3);
 		if (partialTicks) mv.visitLocalVariable("partialTicks", "F", null, l0, l4, 4);
@@ -111,7 +111,7 @@ public class ButtonPatcher implements IClassTransformer {
 		Label l2 = new Label();
 		mv.visitLabel(l2);
 		mv.visitLocalVariable("this", "LClientViaVersionButton;", null, l0, l2, 0);
-		mv.visitLocalVariable("mc", "Lbib;", null, l0, l2, 1);
+		mv.visitLocalVariable("mc", "L" + minecraftClassName + ";", null, l0, l2, 1);
 		mv.visitLocalVariable("mouseX", "I", null, l0, l2, 2);
 		mv.visitLocalVariable("mouseY", "I", null, l0, l2, 3);
 		mv.visitMaxs(3, 4);
