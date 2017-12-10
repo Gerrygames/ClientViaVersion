@@ -43,6 +43,9 @@ public class ClassNames1_12 {
 		CLASS_NAMES.put("f_SearchTreeManager_trees", "c");
 		CLASS_NAMES.put("f_ShapedRecipes_recipeOutput", "d");
 
+		CLASS_NAMES.put("m_Button_draw", "a");
+		CLASS_NAMES.put("m_Button_mouseClicked", "b");
+		CLASS_NAMES.put("m_Button_mouseReleased", "a");
 		CLASS_NAMES.put("m_EntityLiving_getActiveItemStack", "cJ");
 		CLASS_NAMES.put("m_EntityLiving_isHandActive", "cG");
 		CLASS_NAMES.put("m_EntityPlayer_getHeldItem", "b");

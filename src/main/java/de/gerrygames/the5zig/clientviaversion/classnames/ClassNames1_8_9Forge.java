@@ -29,6 +29,9 @@ public class ClassNames1_8_9Forge {
 		CLASS_NAMES.put("f_NetworkManager_connectionState", "field_150739_c");
 		CLASS_NAMES.put("f_NetworkManager_logger", "field_150735_g");
 
+		CLASS_NAMES.put("m_Button_draw", "func_146112_a");
+		CLASS_NAMES.put("m_Button_mouseClicked", "func_146116_c");
+		CLASS_NAMES.put("m_Button_mouseReleased", "func_146119_b");
 		CLASS_NAMES.put("m_Item_getIdFromItem", "func_150891_b");
 		CLASS_NAMES.put("m_ITextComponent_getFormattedText", "func_150254_d");
 		CLASS_NAMES.put("m_World_getEntityByUUID", "func_152378_a");

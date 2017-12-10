@@ -39,6 +39,9 @@ public class ClassNames1_12_2Forge {
 		CLASS_NAMES.put("f_NetworkManager_connectionState", "field_150739_c");
 		CLASS_NAMES.put("f_NetworkManager_logger", "field_150735_g");
 
+		CLASS_NAMES.put("m_Button_draw", "func_191745_a");
+		CLASS_NAMES.put("m_Button_mouseClicked", "func_146116_c");
+		CLASS_NAMES.put("m_Button_mouseReleased", "func_146119_b");
 		CLASS_NAMES.put("m_EntityLiving_getActiveItemStack", "func_184607_cu");
 		CLASS_NAMES.put("m_EntityLiving_isHandActive", "func_184587_cr");
 		CLASS_NAMES.put("m_EntityPlayer_getHeldItem", "func_184586_b");

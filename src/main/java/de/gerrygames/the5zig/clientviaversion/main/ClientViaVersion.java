@@ -1,8 +1,7 @@
 package de.gerrygames.the5zig.clientviaversion.main;
 
 import de.gerrygames.the5zig.clientviaversion.Version;
-import de.gerrygames.the5zig.clientviaversion.gui.ButtonRegistry;
-import de.gerrygames.the5zig.clientviaversion.gui.ButtonToolTipRenderer;
+import de.gerrygames.the5zig.clientviaversion.asm.ButtonPatcher;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.provider.TitleRenderProvider;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.providers.GameProfileProvider;
@@ -10,7 +9,6 @@ import de.gerrygames.the5zig.clientviaversion.providers.ClientGameProfileProvide
 import de.gerrygames.the5zig.clientviaversion.providers.ClientMovementTransmitterProvider;
 import de.gerrygames.the5zig.clientviaversion.providers.ClientTitleProvider;
 import de.gerrygames.the5zig.clientviaversion.providers.ClientTitleProviderTitleRenderer;
-import de.gerrygames.the5zig.clientviaversion.render.RendererRegistry;
 import de.gerrygames.the5zig.clientviaversion.utils.Utils;
 import de.gerrygames.the5zig.clientviaversion.viaversion.CustomViaInjector;
 import eu.the5zig.mod.The5zigAPI;
@@ -19,7 +17,6 @@ import eu.the5zig.mod.modules.Category;
 import eu.the5zig.mod.plugin.Plugin;
 import de.gerrygames.the5zig.clientviaversion.asm.EntitySelectorsPatcher;
 import de.gerrygames.the5zig.clientviaversion.asm.SwordPatcher;
-import de.gerrygames.the5zig.clientviaversion.gui.ButtonClickListener;
 import de.gerrygames.the5zig.clientviaversion.gui.GuiPatcher;
 import de.gerrygames.the5zig.clientviaversion.protocols.ProtocolPatcher;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_9.Protocol1_8TO1_9;
@@ -76,6 +73,7 @@ public class ClientViaVersion {
 			field.setAccessible(true);
 			List<IClassTransformer> transformer = ((List<IClassTransformer>)field.get(launchClassLoader));
 			transformer.add(new EntitySelectorsPatcher());
+			transformer.add(new ButtonPatcher());
 		} catch (Exception ex) {ex.printStackTrace();}
 	}
 
@@ -201,10 +199,6 @@ public class ClientViaVersion {
 			ClientViaVersion.LOGGER.error("Could not edit credits. This has no effect on functionality.");
 			ex.printStackTrace();
 		}
-
-		new ButtonRegistry();
-		new ButtonClickListener();
-		new RendererRegistry().registerRenderer(new ButtonToolTipRenderer());
 	}
 
 	public static void switchState(State oldState, State newState) {}

@@ -43,7 +43,7 @@ public class GuiPatcher {
 			Object gui = Class.forName("Variables").getDeclaredMethod("getMinecraftScreen").invoke(The5zigMod.getVars());
 			if (gui==null || prevScreen==gui) return;
 			prevScreen = gui;
-			ButtonRegistry.getInstance().clear();
+			//ButtonRegistry.getInstance().clear();
 			if (ClassNames.getGuiMultiplayerClass().isInstance(gui)) {
 				GuiPatcher.patchGuiMultiplayer(gui);
 			} else if (ClassNames.getGuiDisconnectedClass().isInstance(gui)) {
@@ -56,7 +56,7 @@ public class GuiPatcher {
 	}
 
 	public static void patchGuiMultiplayer(Object gui) throws Exception {
-		addButton(gui, Class.forName("VersionButton").getConstructor(int.class, int.class, int.class, int.class, int.class, String.class).newInstance(420, liquidBouncePresent ? 206 : 8, liquidBouncePresent ? 8 : 6, 60, 20, ClientViaVersion.selected.getName()));
+		addButton(gui, Class.forName("VersionButton").getConstructor(int.class, int.class, int.class, int.class, int.class).newInstance(420, liquidBouncePresent ? 206 : 8, liquidBouncePresent ? 8 : 6, 60, 20));
 	}
 
 	private static HashMap<String, Integer> versions = new HashMap<>();

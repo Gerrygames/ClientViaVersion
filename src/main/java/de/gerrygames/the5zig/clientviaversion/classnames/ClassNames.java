@@ -385,4 +385,16 @@ public class ClassNames {
 	public static String getSearchTreeRecalculateMethodName() {
 		return getHashMap().get("m_SearchTree_recalculate");
 	}
+
+	public static String getButtonDrawMethodName() {
+		return getHashMap().get("m_Button_draw");
+	}
+
+	public static String getButtonMouseClickedMethodName() {
+		return getHashMap().get("m_Button_mouseClicked");
+	}
+
+	public static String getButtonMouseReleasedMethodName() {
+		return getHashMap().get("m_Button_mouseReleased");
+	}
 }

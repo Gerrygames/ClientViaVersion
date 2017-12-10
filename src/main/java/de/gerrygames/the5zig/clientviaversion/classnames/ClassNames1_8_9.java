@@ -28,6 +28,9 @@ public class ClassNames1_8_9 {
 		CLASS_NAMES.put("f_NetworkManager_connectionState", "c");
 		CLASS_NAMES.put("f_NetworkManager_logger", "g");
 
+		CLASS_NAMES.put("m_Button_draw", "a");
+		CLASS_NAMES.put("m_Button_mouseClicked", "c");
+		CLASS_NAMES.put("m_Button_mouseReleased", "b");
 		CLASS_NAMES.put("m_Item_getIdFromItem", "b");
 		CLASS_NAMES.put("m_ITextComponent_getFormattedText", "d");
 		CLASS_NAMES.put("m_World_getEntityByUUID", "b");
