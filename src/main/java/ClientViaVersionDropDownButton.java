@@ -61,14 +61,20 @@ public class ClientViaVersionDropDownButton extends ClientViaVersionButton {
 	protected void onPostDraw(int mouseX, int mouseY) {
 		this.setHeight(originalHeight + (droppedDown ? elementHeight * elements.size() : 0));
 
+		int y = mouseY - this.getY() - originalHeight;
+		int index = y<=0 ? -1 : y / elementHeight;
 		float scale = 1.0f;
+
 		if (this.droppedDown) {
 			for (int i = 0; i < elements.size(); i++) {
 				DropDownElement element = elements.get(i);
 				int top = this.getY() + originalHeight + elementHeight*i;
 
-				Gui.drawRect(this.getX(), top, this.getX()+this.getWidth(), top+elementHeight+1, abgr(120, 255, 255, 255));
-				Gui.drawRectInline(this.getX(), top, this.getX()+this.getWidth(), top+elementHeight+1, abgr(255, 255, 255, 255));
+				int outlineColor = abgr(255, 255, 255, 255);
+				int color = i==index ? abgr(150, 79, 79, 79) : abgr(120, 255, 255, 255);
+
+				Gui.drawRect(this.getX(), top, this.getX()+this.getWidth(), top+elementHeight+1, color);
+				Gui.drawRectInline(this.getX(), top, this.getX()+this.getWidth(), top+elementHeight+1, outlineColor);
 				Gui.drawScaledCenteredString(element.getDisplayName(), this.getX() + this.getWidth() / 2, top + elementHeight / 2 - (int)(scale * 4), 1.0f);
 			}
 		}

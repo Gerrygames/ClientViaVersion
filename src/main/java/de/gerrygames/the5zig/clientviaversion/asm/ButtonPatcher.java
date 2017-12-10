@@ -1,6 +1,7 @@
 package de.gerrygames.the5zig.clientviaversion.asm;
 
 import de.gerrygames.the5zig.clientviaversion.classnames.ClassNames;
+import de.gerrygames.the5zig.clientviaversion.main.ClientViaVersion;
 import net.minecraft.launchwrapper.IClassTransformer;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
@@ -48,7 +49,10 @@ public class ButtonPatcher implements IClassTransformer {
 	}
 
 	private void addDrawHook(ClassVisitor cv) {
-		MethodVisitor mv = cv.visitMethod(ACC_PUBLIC, drawMethodName, "(L" + minecraftClassName + ";IIF)V", null, null);
+		boolean partialTicks = ClientViaVersion.CLIENT_PROTOCOL_VERSION>47;
+		String descriptor =  partialTicks ? "(L" + minecraftClassName + ";IIF)V" : "(L" + minecraftClassName + ";II)V";
+
+		MethodVisitor mv = cv.visitMethod(ACC_PUBLIC, drawMethodName, descriptor, null, null);
 		mv.visitCode();
 		Label l0 = new Label();
 		mv.visitLabel(l0);
@@ -66,8 +70,8 @@ public class ButtonPatcher implements IClassTransformer {
 		mv.visitVarInsn(ALOAD, 1);
 		mv.visitVarInsn(ILOAD, 2);
 		mv.visitVarInsn(ILOAD, 3);
-		mv.visitVarInsn(FLOAD, 4);
-		mv.visitMethodInsn(INVOKESPECIAL, "Button", drawMethodName, "(L" + minecraftClassName + ";IIF)V", false);
+		if (partialTicks) mv.visitVarInsn(FLOAD, 4);
+		mv.visitMethodInsn(INVOKESPECIAL, "Button", drawMethodName, descriptor, false);
 		mv.visitLabel(l1);
 		mv.visitLineNumber(22, l1);
 		mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
@@ -85,7 +89,7 @@ public class ButtonPatcher implements IClassTransformer {
 		mv.visitLocalVariable("mc", "Lbib;", null, l0, l4, 1);
 		mv.visitLocalVariable("mouseX", "I", null, l0, l4, 2);
 		mv.visitLocalVariable("mouseY", "I", null, l0, l4, 3);
-		mv.visitLocalVariable("partialTicks", "F", null, l0, l4, 4);
+		if (partialTicks) mv.visitLocalVariable("partialTicks", "F", null, l0, l4, 4);
 		mv.visitMaxs(5, 5);
 		mv.visitEnd();
 	}
