@@ -62,7 +62,7 @@ public class ClientViaVersionDropDownButton extends ClientViaVersionButton {
 		this.setHeight(originalHeight + (droppedDown ? elementHeight * elements.size() : 0));
 
 		int y = mouseY - this.getY() - originalHeight;
-		int index = y<=0 ? -1 : y / elementHeight;
+		int index = y<=0 || mouseX<this.getX() || mouseX>this.getX()+this.getWidth() ? -1 : y / elementHeight;
 		float scale = 1.0f;
 
 		if (this.droppedDown) {
