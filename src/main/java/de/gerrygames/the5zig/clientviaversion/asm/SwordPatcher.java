@@ -1,7 +1,5 @@
 package de.gerrygames.the5zig.clientviaversion.asm;
 
-import de.gerrygames.the5zig.clientviaversion.main.ClientViaVersion;
-import eu.the5zig.mod.The5zigMod;
 import eu.the5zig.mod.asm.Transformer;
 import de.gerrygames.the5zig.clientviaversion.classnames.ClassNames;
 import org.objectweb.asm.AnnotationVisitor;
@@ -14,10 +12,6 @@ import org.objectweb.asm.Opcodes;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.security.CodeSource;
-import java.util.List;
-import java.util.Map;
 
 import static org.objectweb.asm.Opcodes.*;
 
@@ -25,8 +19,8 @@ public class SwordPatcher {
 
 	public static void patch() {
 		try {
-			loadClass(dumpCustomSwordBlockingClass(), "CustomSwordBlocking");
-			Class customSwordClass = loadClass(dumpCustomSwordClass(), "CustomSword");
+			ByteClassLoader.loadClass(dumpCustomSwordBlockingClass(), "CustomSwordBlocking");
+			Class customSwordClass = ByteClassLoader.loadClass(dumpCustomSwordClass(), "CustomSword");
 			Class toolMaterialClass = Class.forName(ClassNames.getItemClass().getName() + "$" + ClassNames.getToolMaterialClassName());
 			Constructor customSwordConstructor = customSwordClass.getConstructor(toolMaterialClass);
 
@@ -43,7 +37,7 @@ public class SwordPatcher {
 
 				Object sword = customSwordConstructor.newInstance(toolMaterial);
 				setItemName.invoke(sword, "swordDiamond");
-				registerItem(276, "diamond_sword", sword, oldsword);
+				ItemRegistrar.registerItem(276, "diamond_sword", sword, oldsword);
 			}
 			{
 				Object oldsword = getItemByName.invoke(null, "iron_sword");
@@ -51,7 +45,7 @@ public class SwordPatcher {
 
 				Object sword = customSwordConstructor.newInstance(toolMaterial);
 				setItemName.invoke(sword, "swordIron");
-				registerItem(267, "iron_sword", sword, oldsword);
+				ItemRegistrar.registerItem(267, "iron_sword", sword, oldsword);
 			}
 			{
 				Object oldsword = getItemByName.invoke(null, "stone_sword");
@@ -59,7 +53,7 @@ public class SwordPatcher {
 
 				Object sword = customSwordConstructor.newInstance(toolMaterial);
 				setItemName.invoke(sword, "swordStone");
-				registerItem(272, "stone_sword", sword, oldsword);
+				ItemRegistrar.registerItem(272, "stone_sword", sword, oldsword);
 			}
 			{
 				Object oldsword = getItemByName.invoke(null, "golden_sword");
@@ -67,7 +61,7 @@ public class SwordPatcher {
 
 				Object sword = customSwordConstructor.newInstance(toolMaterial);
 				setItemName.invoke(sword, "swordGold");
-				registerItem(283, "golden_sword", sword, oldsword);
+				ItemRegistrar.registerItem(283, "golden_sword", sword, oldsword);
 			}
 			{
 				Object oldsword = getItemByName.invoke(null, "wooden_sword");
@@ -75,102 +69,11 @@ public class SwordPatcher {
 
 				Object sword = customSwordConstructor.newInstance(toolMaterial);
 				setItemName.invoke(sword, "swordWood");
-				registerItem(268, "wooden_sword", sword, oldsword);
+				ItemRegistrar.registerItem(268, "wooden_sword", sword, oldsword);
 			}
 
-			if (!Transformer.FORGE) {
-				//Update SearchTrees
-				Object mc = Class.forName("Variables").getMethod("getMinecraft").invoke(The5zigMod.getVars());
-
-				Method m = ClassNames.getMinecraftPopulateSearchTreeManagerMethod();
-				m.setAccessible(true);
-				m.invoke(mc);
-
-				Field field = ClassNames.getMinecraftSearchTreeManagerField();
-				field.setAccessible(true);
-				Object searchTreeManager = field.get(mc);
-				field = searchTreeManager.getClass().getDeclaredField(ClassNames.getSearchTreeManagerTreesFieldName());
-				field.setAccessible(true);
-
-				for (Object searchTree : ((Map)field.get(searchTreeManager)).values()) {
-					try {
-						Method recalculate = searchTree.getClass().getDeclaredMethod(ClassNames.getSearchTreeRecalculateMethodName());
-						recalculate.invoke(searchTree);
-					} catch (Exception ignored) {}
-				}
-			}
+			if (!Transformer.FORGE) ItemRegistrar.repopulateSearchTree();
 		} catch (Exception ex) {ex.printStackTrace();}
-	}
-
-	private static void registerItem(int id, String name, Object item, Object olditem) throws Exception {
-		if (Transformer.FORGE) {
-			Field field = ClassNames.getItemRegistryField();
-			field.setAccessible(true);
-			Object registry = field.get(null);
-			field = registry.getClass().getDeclaredField("delegate");
-			field.setAccessible(true);
-			Object delegate = field.get(registry);
-
-			Field isFrozen = delegate.getClass().getDeclaredField("isFrozen");
-			isFrozen.setAccessible(true);
-			isFrozen.set(delegate, false);
-
-			Method registerItem = delegate.getClass().getDeclaredMethod("add", int.class, ClassNames.getIForgeRegistryEntryClass(), String.class);
-			registerItem.setAccessible(true);
-
-			Method setRegistryName = ClassNames.getIForgeRegistryEntrySetRegistryName();
-			setRegistryName.invoke(item, Class.forName("ResourceLocation").getConstructor(String.class).newInstance(name));
-			registerItem.invoke(delegate, id, item, "ClientViaVersion");
-		} else {
-			Method registerItem = ClassNames.getItemRegisterItemMethod();
-			registerItem.setAccessible(true);
-			registerItem.invoke(null, id, name, item);
-
-			if (olditem==null) return;
-			//Replace old item in recipes
-			List recipeLists = (List) ClassNames.getRecipeBookClientAllRecipesField().get(null);
-
-			for (Object recipeList : recipeLists) {
-				List recipes = (List) recipeList.getClass().getMethod(ClassNames.getRecipeListGetRecipesMethodName()).invoke(recipeList);
-				for (Object recipe : recipes) {
-					try {
-						Field field = ClassNames.getShapedRecipesRecipeOutputField();
-						field.setAccessible(true);
-
-						Object itemstack = field.get(recipe);
-						field = ClassNames.getItemStackItemField();
-						field.setAccessible(true);
-						if (field.get(itemstack)==olditem) {
-							Field modifiers = Field.class.getDeclaredField("modifiers");
-							modifiers.setAccessible(true);
-							modifiers.set(field, field.getModifiers() & ~Modifier.FINAL);
-							field.set(itemstack, item);
-						}
-					} catch (Exception ignored) {}
-				}
-			}
-		}
-	}
-
-	private static Class loadClass(byte[] b, String className) {
-		//override classDefine (as it is protected) and define the class.
-		Class clazz = null;
-		try {
-			ClassLoader loader = ClientViaVersion.class.getClassLoader().getParent();
-			Class cls = loader.getClass().getSuperclass().getSuperclass();
-			Method method = cls.getDeclaredMethod("defineClass", String.class, byte[].class, int.class, int.class, CodeSource.class);
-
-			// protected method invocaton
-			method.setAccessible(true);
-			try {
-				clazz = (Class) method.invoke(loader, className, b, 0, b.length, null);
-			} finally {
-				method.setAccessible(false);
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		return clazz;
 	}
 
 	private static byte[] dumpCustomSwordBlockingClass() throws Exception {
