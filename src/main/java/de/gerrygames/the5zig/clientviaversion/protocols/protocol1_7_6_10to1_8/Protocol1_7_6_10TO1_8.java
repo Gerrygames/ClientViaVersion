@@ -1096,6 +1096,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
+						if (packetWrapper.get(Type.UNSIGNED_BYTE, 0)==2) return;
 						CompoundTag nbt = packetWrapper.get(Types1_7_6_10.COMPRESSED_NBT, 0);
 						Utils.iterateCompountTagRecursive(nbt, tag -> {
 							if (tag instanceof StringTag) {
