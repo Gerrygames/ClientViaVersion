@@ -21,10 +21,6 @@ public class ButtonPatcher implements IClassTransformer {
 	@Override
 	public byte[] transform(String s, String s1, byte[] bytes) {
 		if (!s.equals("ClientViaVersionButton")) return bytes;
-		ClientViaVersion.LOGGER.info(minecraftClassName);
-		ClientViaVersion.LOGGER.info(drawMethodName);
-		ClientViaVersion.LOGGER.info(clickMethodName);
-		ClientViaVersion.LOGGER.info(releasedMethodName);
 		try {
 			ClassReader reader;
 			if (bytes==null) {
@@ -35,7 +31,6 @@ public class ButtonPatcher implements IClassTransformer {
 			ClassWriter writer = new ClassWriter(reader, 3);
 			ClassPatcher visitor = new ClassPatcher(writer);
 			reader.accept(visitor, 0);
-			if (bytes!=null) ClientViaVersion.LOGGER.info("l: " + bytes.length);
 			bytes = writer.toByteArray();
 		} catch (Exception ex) {
 			ex.printStackTrace();
