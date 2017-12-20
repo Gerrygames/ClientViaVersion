@@ -13,7 +13,7 @@ import org.objectweb.asm.Opcodes;
 import static org.objectweb.asm.Opcodes.*;
 
 public class ButtonPatcher implements IClassTransformer {
-	private final String minecraftClassName = ClassNames.getMinecraftClass().getName();
+	private final String minecraftClassName = ClassNames.getMinecraftClass().getName().replace(".", "/");
 	private final String drawMethodName = ClassNames.getButtonDrawMethodName();
 	private final String clickMethodName = ClassNames.getButtonMouseClickedMethodName();
 	private final String releasedMethodName = ClassNames.getButtonMouseReleasedMethodName();
@@ -21,12 +21,22 @@ public class ButtonPatcher implements IClassTransformer {
 	@Override
 	public byte[] transform(String s, String s1, byte[] bytes) {
 		if (!s.equals("ClientViaVersionButton")) return bytes;
+		ClientViaVersion.LOGGER.info(minecraftClassName);
+		ClientViaVersion.LOGGER.info(drawMethodName);
+		ClientViaVersion.LOGGER.info(clickMethodName);
+		ClientViaVersion.LOGGER.info(releasedMethodName);
 		try {
-			ClassReader reader = new ClassReader(this.getClass().getResourceAsStream("/ClientViaVersionButton.class"));
+			ClassReader reader;
+			if (bytes==null) {
+				reader = new ClassReader(this.getClass().getResourceAsStream("/ClientViaVersionButton.class"));
+			} else {
+				reader = new ClassReader(bytes);
+			}
 			ClassWriter writer = new ClassWriter(reader, 3);
 			ClassPatcher visitor = new ClassPatcher(writer);
 			reader.accept(visitor, 0);
-			return writer.toByteArray();
+			if (bytes!=null) ClientViaVersion.LOGGER.info("l: " + bytes.length);
+			bytes = writer.toByteArray();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
