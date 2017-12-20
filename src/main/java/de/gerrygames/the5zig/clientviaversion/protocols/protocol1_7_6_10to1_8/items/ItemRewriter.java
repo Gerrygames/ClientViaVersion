@@ -27,8 +27,8 @@ public class ItemRewriter {
 			viaVersionTag.put(new StringTag("displayName", (String) display.get("Name").getValue()));
 		}
 
-		if (item.getId()==387) {
-			ListTag pages = item.getTag().get("pages");
+		if (item.getId()==387 && tag.contains("pages")) {
+			ListTag pages = tag.get("pages");
 			ListTag oldPages = new ListTag("pages", StringTag.class);
 			viaVersionTag.put(oldPages);
 
