@@ -31,3 +31,15 @@ If the plugin is allowed is unknown, but it did not cause any problemes so far:
 -teamkyudo.de  
 -simplehg.net  
 -rewinside.tv  
+
+**Installation** 
+1. Download [The 5zig Mod](https://5zig.net) and install it as described on it's website 
+2. Download the newest jar file under "Releases" 
+3. Put the downloaded jar file in /.minecraft/the5zigmod/plugins/ 
+4. Restart Minecraft and you're done 
+ 
+Optional:    
+1. Download the "resourcepack" folder from this repository    
+2. Put the folder in /.minecraft/resourcepacks    
+3. Select the resourcepack (above all others)    
+4. This enables the blocking animation in 1.12+    
