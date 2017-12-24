@@ -11,7 +11,7 @@ import java.util.Map;
 
 import static us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter.potionNameFromDamage;
 
-@SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+@SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "unused"})
 public class ItemRewriter {
 	private static Map<String, Integer> ENTTIY_NAME_TO_ID;
 	private static Map<Integer, String> ENTTIY_ID_TO_NAME;

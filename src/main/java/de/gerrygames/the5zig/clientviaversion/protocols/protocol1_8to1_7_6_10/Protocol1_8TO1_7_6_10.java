@@ -213,7 +213,7 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 
 						Tablist tablist = packetWrapper.user().get(Tablist.class);
 						Tablist.TabListEntry entryByName = tablist.getTabListEntry(name);
-						if (entryByName==null) entryByName = tablist.getTabListEntry(name.substring(0, 14));
+						if (entryByName==null && name.length()>14) entryByName = tablist.getTabListEntry(name.substring(0, 14));
 						Tablist.TabListEntry entryByUUID = tablist.getTabListEntry(uuid);
 
 						if (entryByName==null || entryByUUID==null) {
