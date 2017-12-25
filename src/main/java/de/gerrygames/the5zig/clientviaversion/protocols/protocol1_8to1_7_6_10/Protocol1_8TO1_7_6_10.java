@@ -419,7 +419,7 @@ public class Protocol1_8TO1_7_6_10 extends Protocol {
 				map(Type.VAR_INT);  //Entity Id
 				map(Type.STRING);  //Title
 				map(xyzToPosition, new TypeRemapper<>(Type.POSITION));  //Position
-				map(Type.UNSIGNED_BYTE);  //Rotation
+				map(Type.INT, Type.BYTE);  //Rotation
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
