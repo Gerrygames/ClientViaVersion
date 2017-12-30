@@ -29,6 +29,9 @@ Plugin is not allowed but is currently not being detected automatically:
 Plugin is allowed but an unban is not guaranteed **if** you get banned on:  
 -gommehd.net  
 
+Plugin is allowed on:  
+-[bergwerklabs.de](https://bergwerklabs.de/threads/erfragung-der-erlaubnis-einer-modifikation.18575/#post-82366)  
+
 If the plugin is allowed is unknown, but it did not cause any problemes so far:  
 -teamkyudo.de  
 -simplehg.net  
