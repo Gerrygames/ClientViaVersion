@@ -86,7 +86,6 @@ public class SwordPatcher {
 		ClassWriter cw = new ClassWriter(0);
 		FieldVisitor fv;
 		MethodVisitor mv;
-		AnnotationVisitor av0;
 
 		cw.visit(52, ACC_PUBLIC + ACC_SUPER, "CustomSwordBlocking", null, "java/lang/Object", new String[]{itemPropertyGetterClass});
 
@@ -101,22 +100,11 @@ public class SwordPatcher {
 			mv.visitVarInsn(ALOAD, 0);
 			mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
 			mv.visitInsn(RETURN);
-			Label l1 = new Label();
-			mv.visitLabel(l1);
-			mv.visitLocalVariable("this", "LCustomSwordBlocking;", null, l0, l1, 0);
 			mv.visitMaxs(1, 1);
 			mv.visitEnd();
 		}
 		{
 			mv = cw.visitMethod(ACC_PUBLIC, itemPropertyGetterApplyMethod, "(L" + itemStackClass + ";L" + worldClass + ";L" + entityLivingClass + ";)F", null, null);
-			{
-				av0 = mv.visitParameterAnnotation(1, "Ljavax/annotation/Nullable;", true);
-				av0.visitEnd();
-			}
-			{
-				av0 = mv.visitParameterAnnotation(2, "Ljavax/annotation/Nullable;", true);
-				av0.visitEnd();
-			}
 			mv.visitCode();
 			Label l0 = new Label();
 			mv.visitLabel(l0);
@@ -140,12 +128,6 @@ public class SwordPatcher {
 			mv.visitLabel(l2);
 			mv.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[]{Opcodes.FLOAT});
 			mv.visitInsn(FRETURN);
-			Label l3 = new Label();
-			mv.visitLabel(l3);
-			mv.visitLocalVariable("this", "LCustomSwordBlocking;", null, l0, l3, 0);
-			mv.visitLocalVariable("itemStack", "L" + itemStackClass + ";", null, l0, l3, 1);
-			mv.visitLocalVariable("world", "L" + worldClass + ";", null, l0, l3, 2);
-			mv.visitLocalVariable("entityLiving", "L" + entityLivingClass + ";", null, l0, l3, 3);
 			mv.visitMaxs(2, 4);
 			mv.visitEnd();
 		}
@@ -174,6 +156,7 @@ public class SwordPatcher {
 		String resourceClass = Class.forName("ResourceLocation").getSuperclass().getName().replace(".", "/");
 		String itemPropertyGetter = ClassNames.getItemPropertyGetterClass().getName().replace(".", "/");
 		String addPropertyOverrided = ClassNames.getItemAddPropertyOverrideMethodName();
+		String maxItemUseDurationMethod = ClassNames.getItemSwordGetMaxItemUseDurationName();
 
 
 		ClassWriter cw = new ClassWriter(0);
@@ -212,10 +195,6 @@ public class SwordPatcher {
 			mv.visitLabel(l2);
 			mv.visitLineNumber(10, l2);
 			mv.visitInsn(RETURN);
-			Label l3 = new Label();
-			mv.visitLabel(l3);
-			mv.visitLocalVariable("this", "LCustomSword;", null, l0, l3, 0);
-			mv.visitLocalVariable("a", "L" + itemClass + "$" + toolMaterialClass + ";", null, l0, l3, 1);
 			mv.visitMaxs(5, 2);
 			mv.visitEnd();
 		}
@@ -279,13 +258,6 @@ public class SwordPatcher {
 			mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 			mv.visitFieldInsn(GETSTATIC, enumAction, Transformer.FORGE ? "NONE" : "a", "L" + enumAction + ";");
 			mv.visitInsn(ARETURN);
-			Label l9 = new Label();
-			mv.visitLabel(l9);
-			mv.visitLocalVariable("field", "Ljava/lang/reflect/Field;", null, l3, l6, 2);
-			mv.visitLocalVariable("logger", "Lorg/apache/logging/log4j/simple/SimpleLogger;", null, l5, l6, 3);
-			mv.visitLocalVariable("ex", "Ljava/lang/Exception;", null, l8, l7, 2);
-			mv.visitLocalVariable("this", "LCustomSword;", null, l0, l9, 0);
-			mv.visitLocalVariable("itemStack", "L" + itemStackClass + ";", null, l0, l9, 1);
 			mv.visitMaxs(5, 4);
 			mv.visitEnd();
 		}
@@ -373,31 +345,17 @@ public class SwordPatcher {
 			mv.visitVarInsn(ALOAD, 3);
 			mv.visitMethodInsn(INVOKESPECIAL, swordClass, onItemRightClickMethod, "(L" + worldClass + ";L" + playerClass + ";L" + enumHand + ";)L" + actionResultClass + ";", false);
 			mv.visitInsn(ARETURN);
-			Label l12 = new Label();
-			mv.visitLabel(l12);
-			mv.visitLocalVariable("handItem", "L" + itemStackClass + ";", null, l8, l6, 6);
-			mv.visitLocalVariable("field", "Ljava/lang/reflect/Field;", null, l3, l6, 4);
-			mv.visitLocalVariable("logger", "Lorg/apache/logging/log4j/simple/SimpleLogger;", null, l5, l6, 5);
-			mv.visitLocalVariable("ex", "Ljava/lang/Exception;", null, l11, l10, 4);
-			mv.visitLocalVariable("this", "LCustomSwordtest;", null, l0, l12, 0);
-			mv.visitLocalVariable("world", "L" + worldClass + ";", null, l0, l12, 1);
-			mv.visitLocalVariable("player", "L" + playerClass + ";", null, l0, l12, 2);
-			mv.visitLocalVariable("hand", "L" + enumHand + ";", null, l0, l12, 3);
 			mv.visitMaxs(5, 7);
 			mv.visitEnd();
 		}
 		{
-			mv = cw.visitMethod(ACC_PUBLIC, ClassNames.getItemSwordGetMaxItemUseDurationName(), "(L" + itemStackClass + ";)I", null, null);
+			mv = cw.visitMethod(ACC_PUBLIC, maxItemUseDurationMethod, "(L" + itemStackClass + ";)I", null, null);
 			mv.visitCode();
 			Label l0 = new Label();
 			mv.visitLabel(l0);
 			mv.visitLineNumber(38, l0);
 			mv.visitLdcInsn(72000);
 			mv.visitInsn(IRETURN);
-			Label l1 = new Label();
-			mv.visitLabel(l1);
-			mv.visitLocalVariable("this", "LCustomSwordtest;", null, l0, l1, 0);
-			mv.visitLocalVariable("itemStack", "L" + itemStackClass + ";", null, l0, l1, 1);
 			mv.visitMaxs(1, 2);
 			mv.visitEnd();
 		}

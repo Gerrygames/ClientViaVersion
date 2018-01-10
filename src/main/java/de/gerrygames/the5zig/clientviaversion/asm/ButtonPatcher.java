@@ -17,14 +17,15 @@ public class ButtonPatcher implements IClassTransformer {
 	private final String drawMethodName = ClassNames.getButtonDrawMethodName();
 	private final String clickMethodName = ClassNames.getButtonMouseClickedMethodName();
 	private final String releasedMethodName = ClassNames.getButtonMouseReleasedMethodName();
+	private final String buttonClassName = "ClientViaVersionButton";
 
 	@Override
 	public byte[] transform(String s, String s1, byte[] bytes) {
-		if (!s.equals("ClientViaVersionButton")) return bytes;
+		if (!s.equals(buttonClassName)) return bytes;
 		try {
 			ClassReader reader;
 			if (bytes==null) {
-				reader = new ClassReader(this.getClass().getResourceAsStream("/ClientViaVersionButton.class"));
+				reader = new ClassReader(this.getClass().getResourceAsStream("/" + buttonClassName.replace(".", "/") + ".class"));
 			} else {
 				reader = new ClassReader(bytes);
 			}
@@ -65,7 +66,7 @@ public class ButtonPatcher implements IClassTransformer {
 		mv.visitVarInsn(ALOAD, 0);
 		mv.visitVarInsn(ILOAD, 2);
 		mv.visitVarInsn(ILOAD, 3);
-		mv.visitMethodInsn(INVOKEVIRTUAL, "ClientViaVersionButton", "onPreDraw", "(II)Z", false);
+		mv.visitMethodInsn(INVOKEVIRTUAL, buttonClassName.replace(".", "/"), "onPreDraw", "(II)Z", false);
 		Label l1 = new Label();
 		mv.visitJumpInsn(IFEQ, l1);
 		Label l2 = new Label();
@@ -83,18 +84,11 @@ public class ButtonPatcher implements IClassTransformer {
 		mv.visitVarInsn(ALOAD, 0);
 		mv.visitVarInsn(ILOAD, 2);
 		mv.visitVarInsn(ILOAD, 3);
-		mv.visitMethodInsn(INVOKEVIRTUAL, "ClientViaVersionButton", "onPostDraw", "(II)V", false);
+		mv.visitMethodInsn(INVOKEVIRTUAL, buttonClassName.replace(".", "/"), "onPostDraw", "(II)V", false);
 		Label l3 = new Label();
 		mv.visitLabel(l3);
 		mv.visitLineNumber(23, l3);
 		mv.visitInsn(RETURN);
-		Label l4 = new Label();
-		mv.visitLabel(l4);
-		mv.visitLocalVariable("this", "LClientViaVersionButton;", null, l0, l4, 0);
-		mv.visitLocalVariable("mc", "L" + minecraftClassName + ";", null, l0, l4, 1);
-		mv.visitLocalVariable("mouseX", "I", null, l0, l4, 2);
-		mv.visitLocalVariable("mouseY", "I", null, l0, l4, 3);
-		if (partialTicks) mv.visitLocalVariable("partialTicks", "F", null, l0, l4, 4);
 		mv.visitMaxs(5, 5);
 		mv.visitEnd();
 	}
@@ -108,17 +102,11 @@ public class ButtonPatcher implements IClassTransformer {
 		mv.visitVarInsn(ALOAD, 0);
 		mv.visitVarInsn(ILOAD, 2);
 		mv.visitVarInsn(ILOAD, 3);
-		mv.visitMethodInsn(INVOKEVIRTUAL, "ClientViaVersionButton", "mouseWasReleased", "(II)V", false);
+		mv.visitMethodInsn(INVOKEVIRTUAL, buttonClassName.replace(".", "/"), "mouseWasReleased", "(II)V", false);
 		Label l1 = new Label();
 		mv.visitLabel(l1);
 		mv.visitLineNumber(26, l1);
 		mv.visitInsn(RETURN);
-		Label l2 = new Label();
-		mv.visitLabel(l2);
-		mv.visitLocalVariable("this", "LClientViaVersionButton;", null, l0, l2, 0);
-		mv.visitLocalVariable("mc", "L" + minecraftClassName + ";", null, l0, l2, 1);
-		mv.visitLocalVariable("mouseX", "I", null, l0, l2, 2);
-		mv.visitLocalVariable("mouseY", "I", null, l0, l2, 3);
 		mv.visitMaxs(3, 4);
 		mv.visitEnd();
 	}
@@ -132,7 +120,7 @@ public class ButtonPatcher implements IClassTransformer {
 		mv.visitVarInsn(ALOAD, 0);
 		mv.visitVarInsn(ILOAD, 2);
 		mv.visitVarInsn(ILOAD, 3);
-		mv.visitMethodInsn(INVOKEVIRTUAL, "ClientViaVersionButton", "isHovered", "(II)Z", false);
+		mv.visitMethodInsn(INVOKEVIRTUAL, buttonClassName.replace(".", "/"), "isHovered", "(II)Z", false);
 		Label l1 = new Label();
 		mv.visitJumpInsn(IFEQ, l1);
 		Label l2 = new Label();
@@ -141,7 +129,7 @@ public class ButtonPatcher implements IClassTransformer {
 		mv.visitVarInsn(ALOAD, 0);
 		mv.visitVarInsn(ILOAD, 2);
 		mv.visitVarInsn(ILOAD, 3);
-		mv.visitMethodInsn(INVOKEVIRTUAL, "ClientViaVersionButton", "mouseWasClicked", "(II)V", false);
+		mv.visitMethodInsn(INVOKEVIRTUAL, buttonClassName.replace(".", "/"), "mouseWasClicked", "(II)V", false);
 		Label l3 = new Label();
 		mv.visitLabel(l3);
 		mv.visitLineNumber(51, l3);
@@ -152,12 +140,6 @@ public class ButtonPatcher implements IClassTransformer {
 		mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 		mv.visitInsn(ICONST_0);
 		mv.visitInsn(IRETURN);
-		Label l4 = new Label();
-		mv.visitLabel(l4);
-		mv.visitLocalVariable("this", "LClientViaVersionButton;", null, l0, l4, 0);
-		mv.visitLocalVariable("mc", "L" + minecraftClassName + ";", null, l0, l4, 1);
-		mv.visitLocalVariable("mouseX", "I", null, l0, l4, 2);
-		mv.visitLocalVariable("mouseY", "I", null, l0, l4, 3);
 		mv.visitMaxs(3, 4);
 		mv.visitEnd();
 	}
