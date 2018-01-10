@@ -23,11 +23,16 @@ Plugin is not allowed and does yield in an automatic ban on:
 -timolia.de  
 -play.epicube.fr  
 
+Plugin is not allowed but is currently not being detected automatically:  
+-minesucht.net ([MinesuchtFucker](https://youtu.be/oYaUbqndGpg) needed)  
+
 Plugin is allowed but an unban is not guaranteed **if** you get banned on:  
 -gommehd.net  
 
+Plugin is allowed on:  
+-[bergwerklabs.de](https://bergwerklabs.de/threads/erfragung-der-erlaubnis-einer-modifikation.18575/#post-82366)  
+
 If the plugin is allowed is unknown, but it did not cause any problemes so far:  
--minesucht.net ([MinesuchtFucker](https://youtu.be/oYaUbqndGpg) needed)  
 -teamkyudo.de  
 -simplehg.net  
 -rewinside.tv  
