@@ -24,15 +24,20 @@ public class VersionButton extends ClientViaVersionDropDownButton {
 		Collections.reverse(elements);
 	}
 
-	private float lastX = 0;
-	private float lastY = 0;
+	private float lastX = Float.NaN;
+	private float lastY = Float.NaN;
 	private static final float drag = 0.5f;
 	private static final String toolTip = "§cUse at own risk!";
 	@Override
 	protected void onPostDraw(int mouseX, int mouseY) {
 		super.onPostDraw(mouseX, mouseY);
-		lastX = lastX + (((float)mouseX) - lastX) * drag;
-		lastY = lastY + (((float)mouseY) - lastY) * drag;
+		if (Float.isNaN(lastX)) {
+			lastX = mouseX;
+			lastY = mouseY;
+		} else {
+			lastX = lastX + (((float)mouseX) - lastX) * drag;
+			lastY = lastY + (((float)mouseY) - lastY) * drag;
+		}
 
 		if (isHovered(mouseX, mouseY)) {
 			Gui.drawScaledString(toolTip, lastX+5, lastY, 1.1f);
