@@ -189,31 +189,17 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>com.google.code.maven-replacer-plugin</groupId>
-                <artifactId>maven-replacer-plugin</artifactId>
-                <version>1.4.0</version>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>templating-maven-plugin</artifactId>
+                <version>1.0.0</version>
                 <executions>
                     <execution>
-                        <phase>process-sources</phase>
+                        <id>filter-src</id>
                         <goals>
-                            <goal>replace</goal>
+                            <goal>filter-sources</goal>
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <file>VersionTemplate.txt</file>
-                    <outputFile>src/main/java/de/gerrygames/the5zig/clientviaversion/Version.java</outputFile>
-                    <replacements>
-                        <replacement>
-                            <token>buildtime</token>
-                            <value>${maven.build.timestamp}</value>
-                        </replacement>
-                        <replacement>
-                            <token>pomversion</token>
-                            <value>${project.version}</value>
-                        </replacement>
-                    </replacements>
-                </configuration>
             </plugin>
         </plugins>
     </build>
