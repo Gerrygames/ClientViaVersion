@@ -1,6 +1,7 @@
 package de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.metadata;
 
-import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.types.MetaType1_7_6_10;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.MetaType1_7_6_10;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_7_6_10.metadata.MetaIndex1_8to1_7_6_10;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.entities.Entity1_10Types;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;

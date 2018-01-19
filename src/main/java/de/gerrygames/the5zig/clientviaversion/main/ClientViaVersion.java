@@ -2,8 +2,7 @@ package de.gerrygames.the5zig.clientviaversion.main;
 
 import de.gerrygames.the5zig.clientviaversion.Version;
 import de.gerrygames.the5zig.clientviaversion.asm.ButtonPatcher;
-import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
-import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.provider.TitleRenderProvider;
+import de.gerrygames.the5zig.clientviaversion.netty.ViaTransformerOut;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.providers.GameProfileProvider;
 import de.gerrygames.the5zig.clientviaversion.providers.ClientGameProfileProvider;
 import de.gerrygames.the5zig.clientviaversion.providers.ClientMovementTransmitterProvider;
@@ -11,6 +10,9 @@ import de.gerrygames.the5zig.clientviaversion.providers.ClientTitleProvider;
 import de.gerrygames.the5zig.clientviaversion.providers.ClientTitleProviderTitleRenderer;
 import de.gerrygames.the5zig.clientviaversion.utils.Utils;
 import de.gerrygames.the5zig.clientviaversion.viaversion.CustomViaInjector;
+import de.gerrygames.the5zig.clientviaversion.viaversion.CustomViaRewindPlatform;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.provider.TitleRenderProvider;
+import de.gerrygames.viarewind.utils.PacketUtil;
 import eu.the5zig.mod.The5zigAPI;
 import eu.the5zig.mod.event.*;
 import eu.the5zig.mod.modules.Category;
@@ -19,7 +21,6 @@ import de.gerrygames.the5zig.clientviaversion.asm.EntitySelectorsPatcher;
 import de.gerrygames.the5zig.clientviaversion.asm.SwordPatcher;
 import de.gerrygames.the5zig.clientviaversion.gui.GuiPatcher;
 import de.gerrygames.the5zig.clientviaversion.protocols.ProtocolPatcher;
-import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_9.Protocol1_8TO1_9;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_9to1_8.AttributeManager;
 import de.gerrygames.the5zig.clientviaversion.reflection.Injector;
 import de.gerrygames.the5zig.clientviaversion.utils.Scheduler;
@@ -140,6 +141,8 @@ public class ClientViaVersion {
 		Via.init(ViaManager.builder().platform(new CustomViaPlatform()).injector(new CustomViaInjector()).build());
 		Via.getManager().getProviders().use(BulkChunkTranslatorProvider.class, new BulkChunkTranslatorProvider());
 		new CustomViaBackwardsPlatform();
+		new CustomViaRewindPlatform();
+		PacketUtil.serverSender = ViaTransformerOut::sendToServer;
 		Via.getManager().getProviders().use(HandItemProvider.class, new ClientHandItemProvider());
 		Via.getManager().getProviders().use(MovementTransmitterProvider.class, new ClientMovementTransmitterProvider());
 		Via.getManager().getProviders().use(GameProfileProvider.class, new ClientGameProfileProvider());
@@ -149,8 +152,6 @@ public class ClientViaVersion {
 		ProtocolRegistry.registerProtocol(new Protocol1_8TO1_7_6_10(), Collections.singletonList(47), 5);
 		ProtocolVersion.register(new ProtocolVersion(4, "1.7.1-5"));
 		ProtocolRegistry.registerProtocol(new Protocol1_7_6_10to1_7_1_5(), Collections.singletonList(5), 4);
-		ProtocolRegistry.registerProtocol(new Protocol1_8TO1_9(), Collections.singletonList(47), 107);
-		ProtocolRegistry.registerProtocol(new Protocol1_7_6_10TO1_8(), Collections.singletonList(5), 47);
 		ProtocolPatcher.patch();
 
 		supportedVersion = new ArrayList<>(ProtocolVersion.getProtocols());

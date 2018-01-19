@@ -9,8 +9,9 @@ import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.st
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.storage.MapStorage;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.storage.Tablist;
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.storage.Windows;
-import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.types.CustomStringType;
-import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.types.Types1_7_6_10;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.CustomIntType;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.CustomStringType;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import eu.the5zig.mod.The5zigAPI;
 import eu.the5zig.util.minecraft.ChatColor;
 import io.netty.buffer.ByteBuf;
@@ -30,7 +31,6 @@ import us.myles.ViaVersion.api.type.types.CustomByteType;
 import us.myles.ViaVersion.api.type.types.VoidType;
 import us.myles.ViaVersion.api.type.types.version.Types1_8;
 import us.myles.ViaVersion.packets.State;
-import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.types.CustomIntType;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.util.GsonUtil;
 

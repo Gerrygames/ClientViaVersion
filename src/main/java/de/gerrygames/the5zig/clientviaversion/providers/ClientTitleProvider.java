@@ -1,8 +1,8 @@
 package de.gerrygames.the5zig.clientviaversion.providers;
 
 import de.gerrygames.the5zig.clientviaversion.main.ClientViaVersion;
-import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_8.provider.TitleRenderProvider;
 import de.gerrygames.the5zig.clientviaversion.utils.Utils;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.provider.TitleRenderProvider;
 import eu.the5zig.mod.The5zigAPI;
 import eu.the5zig.mod.event.EventHandler;
 import eu.the5zig.mod.event.TickEvent;

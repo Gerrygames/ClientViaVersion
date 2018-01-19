@@ -1,6 +1,7 @@
 package de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_7_1_5;
 
-import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_7_6_10to1_7_1_5.types.Types1_7_1_5;
+import de.gerrygames.viarewind.protocol.protocol1_7_0_5to1_7_6_10.types.Types1_7_1_5;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
@@ -8,7 +9,6 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
-import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.types.Types1_7_6_10;
 
 public class Protocol1_7_6_10to1_7_1_5 extends Protocol {
 	@Override

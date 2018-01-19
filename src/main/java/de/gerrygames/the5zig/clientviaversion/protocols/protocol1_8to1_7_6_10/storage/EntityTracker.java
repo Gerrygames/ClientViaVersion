@@ -1,7 +1,7 @@
 package de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.storage;
 
 import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.Protocol1_8TO1_7_6_10;
-import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_9.metadata.MetadataRewriter;
+import de.gerrygames.the5zig.clientviaversion.protocols.protocol1_8to1_7_6_10.metadata.MetadataRewriter;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
