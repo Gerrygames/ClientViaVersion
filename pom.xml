@@ -170,6 +170,14 @@
                                     <include>com.github.steveice10:opennbt</include>
                                 </includes>
                             </artifactSet>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>mojang-translations/**</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                             <relocations>
                                 <relocation>
                                     <pattern>com.github.steveice10.opennbt</pattern>
