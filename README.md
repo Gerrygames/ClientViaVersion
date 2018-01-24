@@ -22,6 +22,7 @@ I can not guarantee that this plugin is allowed on every (or even any) server. T
 Plugin is not allowed and does yield in an automatic ban on:  
 -timolia.de  
 -play.epicube.fr  
+-badlion.net  
 
 Plugin is not allowed but is currently not being detected automatically:  
 -minesucht.net ([MinesuchtFucker](https://youtu.be/oYaUbqndGpg) needed)  
