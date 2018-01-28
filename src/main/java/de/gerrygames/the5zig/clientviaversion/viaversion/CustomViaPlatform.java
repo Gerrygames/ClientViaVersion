@@ -2,8 +2,6 @@ package de.gerrygames.the5zig.clientviaversion.viaversion;
 
 import de.gerrygames.the5zig.clientviaversion.Version;
 import de.gerrygames.the5zig.clientviaversion.utils.Scheduler;
-import eu.the5zig.mod.The5zigAPI;
-import eu.the5zig.mod.The5zigMod;
 import us.myles.ViaVersion.api.ViaAPI;
 import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
@@ -31,12 +29,12 @@ public class CustomViaPlatform implements ViaPlatform {
 
 	@Override
 	public String getPlatformVersion() {
-		return The5zigAPI.getAPI().getMinecraftVersion();
+		return Version.PLUGIN_VERSION;
 	}
 
 	@Override
 	public String getPluginVersion() {
-		return Version.PLUGIN_VERSION;
+		return "unknown";
 	}
 
 	@Override
@@ -89,9 +87,7 @@ public class CustomViaPlatform implements ViaPlatform {
 
 	@Override
 	public void sendMessage(UUID uuid, String msg) {
-		if (uuid.equals(The5zigMod.getVars().getGameProfile().getId())) {
-			The5zigMod.getVars().messagePlayer(msg);
-		}
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -129,6 +125,6 @@ public class CustomViaPlatform implements ViaPlatform {
 
 	@Override
 	public boolean isOldClientsAllowed() {
-		return false;
+		return true;
 	}
 }

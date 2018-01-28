@@ -1,6 +1,5 @@
 package de.gerrygames.the5zig.clientviaversion.viaversion;
 
-import eu.the5zig.mod.The5zigMod;
 import io.netty.buffer.ByteBuf;
 import de.gerrygames.the5zig.clientviaversion.main.ClientViaVersion;
 import us.myles.ViaVersion.api.Via;
@@ -8,6 +7,7 @@ import us.myles.ViaVersion.api.ViaAPI;
 import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
+import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
 import java.util.SortedSet;
 import java.util.UUID;
@@ -15,12 +15,12 @@ import java.util.UUID;
 public class CustomViaAPI implements ViaAPI {
 	@Override
 	public int getPlayerVersion(Object o) {
-		return -1;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public int getPlayerVersion(UUID uuid) {
-		return uuid.equals(The5zigMod.getVars().getGameProfile().getId()) ? ClientViaVersion.CLIENT_PROTOCOL_VERSION : ClientViaVersion.spoofedVersion;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -30,7 +30,7 @@ public class CustomViaAPI implements ViaAPI {
 
 	@Override
 	public String getVersion() {
-		return ClientViaVersion.selected.getName();
+		return "unknown";
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class CustomViaAPI implements ViaAPI {
 
 	@Override
 	public void sendRawPacket(UUID uuid, ByteBuf byteBuf) throws IllegalArgumentException {
-		if (uuid.equals(The5zigMod.getVars().getGameProfile().getId())) {
+		if (uuid.equals(ClientViaVersion.user.get(ProtocolInfo.class).getUuid())) {
 			ClientViaVersion.user.sendRawPacket(byteBuf);
 		}
 	}
