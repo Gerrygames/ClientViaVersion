@@ -174,7 +174,6 @@
                                 <filter>
                                     <artifact>*:*</artifact>
                                     <excludes>
-                                        <exclude>mojang-translations/**</exclude>
                                         <exclude>assets/viaversion/config.yml</exclude>
                                     </excludes>
                                 </filter>
