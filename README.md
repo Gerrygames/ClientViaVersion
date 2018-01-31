@@ -25,7 +25,7 @@ Plugin is not allowed and does yield in an automatic ban on:
 -badlion.net  
 
 Plugin is not allowed but is currently not being detected automatically:  
--minesucht.net ([MinesuchtFucker](https://youtu.be/oYaUbqndGpg) needed)  
+-minesucht.net  
 
 Plugin is allowed but an unban is not guaranteed **if** you get banned on:  
 -gommehd.net  
