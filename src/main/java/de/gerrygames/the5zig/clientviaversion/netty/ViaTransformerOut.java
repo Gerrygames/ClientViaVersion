@@ -1,5 +1,6 @@
 package de.gerrygames.the5zig.clientviaversion.netty;
 
+import eu.the5zig.mod.The5zigAPI;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;
@@ -25,6 +26,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ViaTransformerOut extends MessageToByteEncoder<ByteBuf> {
+	private static boolean oldNetty = false;
+	static {
+		oldNetty = ClientViaVersion.CLIENT_PROTOCOL_VERSION<=5 || The5zigAPI.getAPI().getMinecraftVersion().equals("1.8");
+	}
+
 	@Override
 	protected void encode(ChannelHandlerContext ctx, ByteBuf in, ByteBuf out) throws Exception {
 		int packetId = Type.VAR_INT.read(in);
@@ -102,7 +108,7 @@ public class ViaTransformerOut extends MessageToByteEncoder<ByteBuf> {
 		ByteBuf buf = null;
 		try {
 				ByteBuf cast = (ByteBuf) msg;
-				if (ClientViaVersion.CLIENT_PROTOCOL_VERSION<=5) {
+				if (oldNetty) {
 					buf = ctx.alloc().ioBuffer();
 				} else {
 					buf = this.allocateBuffer(ctx, cast, true);
