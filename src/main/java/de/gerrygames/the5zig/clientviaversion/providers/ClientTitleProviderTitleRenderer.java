@@ -38,6 +38,7 @@ public class ClientTitleProviderTitleRenderer extends AbstractModuleItem {
 			String title = ClientTitleProvider.getInstance().getTitle();
 			if (title==null) return 0;
 			String subTitle = ClientTitleProvider.getInstance().getSubTitle();
+			if (subTitle==null) return The5zigAPI.getAPI().getRenderHelper().getStringWidth(title);
 			return Math.max(The5zigAPI.getAPI().getRenderHelper().getStringWidth(title), The5zigAPI.getAPI().getRenderHelper().getStringWidth(subTitle));
 		}
 	}
