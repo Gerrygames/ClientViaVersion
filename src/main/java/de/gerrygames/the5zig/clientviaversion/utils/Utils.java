@@ -31,22 +31,6 @@ public class Utils {
 		return airItem();
 	}
 
-	public static String jsonToLegacy(String json) {
-		if (json==null) return null;
-		String legacy = json.startsWith("{") ? TextComponent.toLegacyText(ComponentSerializer.parse(json)) : json;
-		if (legacy.startsWith("§f§f")) legacy = legacy.substring(4, legacy.length());
-		legacy = legacy.replaceAll("((§.)*)\"(.*)\"((§.)*)", "$1$3$4");
-		return legacy;
-	}
-
-	public static String removeUnusedColor(String legacy) {
-		if (legacy==null) return null;
-		legacy = legacy.replaceAll("§[0-f](§[0-f|r])", "$1");
-		legacy = legacy.replaceAll("(§.)?\\1", "$1");
-		legacy = legacy.replaceAll("(§.)*\\Z", "");
-		return legacy;
-	}
-
 	public static void iterateCompountTagRecursive(CompoundTag tag, final Consumer<Tag> action) {
 		tag.values().forEach(child -> {
 			if (child instanceof CompoundTag) iterateCompountTagRecursive((CompoundTag) child, action);

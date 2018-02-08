@@ -2,6 +2,7 @@ package de.gerrygames.the5zig.clientviaversion.viaversion;
 
 import de.gerrygames.the5zig.clientviaversion.Version;
 import de.gerrygames.the5zig.clientviaversion.utils.Scheduler;
+import eu.the5zig.mod.The5zigAPI;
 import us.myles.ViaVersion.api.ViaAPI;
 import us.myles.ViaVersion.api.ViaVersionConfig;
 import us.myles.ViaVersion.api.command.ViaCommandSender;
@@ -87,7 +88,9 @@ public class CustomViaPlatform implements ViaPlatform {
 
 	@Override
 	public void sendMessage(UUID uuid, String msg) {
-		throw new UnsupportedOperationException();
+		if (uuid.equals(The5zigAPI.getAPI().getGameProfile().getId())) {
+			The5zigAPI.getAPI().messagePlayer(msg);
+		}
 	}
 
 	@Override
