@@ -7,8 +7,6 @@ import eu.the5zig.mod.The5zigAPI;
 import eu.the5zig.mod.event.EventHandler;
 import eu.the5zig.mod.event.TickEvent;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 public class ClientTitleProvider extends TitleRenderProvider {
 	private static ClientTitleProvider instance;
 
@@ -23,9 +21,9 @@ public class ClientTitleProvider extends TitleRenderProvider {
 
 	@EventHandler
 	public void onTick(TickEvent event) {
-		AtomicInteger time = getTime(ClientViaVersion.user);
-		if (time.get()>0 && time.decrementAndGet() <= 0) {
-			clear(ClientViaVersion.user);
+		if (getTime(ClientViaVersion.user).decrementAndGet() <= 0) {
+			this.titles.remove(ClientViaVersion.user);
+			this.subTitles.remove(ClientViaVersion.user);
 		}
 	}
 
