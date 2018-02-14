@@ -19,6 +19,11 @@ public class CustomViaRewindPlatform implements ViaRewindPlatform {
 			public boolean isReplaceAdventureMode() {
 				return true;
 			}
+
+			@Override
+			public boolean isReplaceParticles() {
+				return true;
+			}
 		});
 	}
 
