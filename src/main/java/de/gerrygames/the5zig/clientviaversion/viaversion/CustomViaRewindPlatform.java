@@ -14,6 +14,11 @@ public class CustomViaRewindPlatform implements ViaRewindPlatform {
 			public CooldownIndicator getCooldownIndicator() {
 				return CooldownIndicator.TITLE;
 			}
+
+			@Override
+			public boolean isReplaceAdventureMode() {
+				return true;
+			}
 		});
 	}
 
