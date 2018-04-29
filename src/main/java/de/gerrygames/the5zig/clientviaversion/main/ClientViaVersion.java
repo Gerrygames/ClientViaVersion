@@ -14,6 +14,7 @@ import de.gerrygames.the5zig.clientviaversion.viaversion.CustomViaRewindPlatform
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.provider.TitleRenderProvider;
 import de.gerrygames.viarewind.utils.PacketUtil;
 import eu.the5zig.mod.The5zigAPI;
+import eu.the5zig.mod.The5zigMod;
 import eu.the5zig.mod.event.*;
 import eu.the5zig.mod.modules.Category;
 import eu.the5zig.mod.plugin.Plugin;
@@ -46,6 +47,7 @@ import de.gerrygames.the5zig.clientviaversion.providers.ClientHandItemProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.HandItemProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -58,10 +60,10 @@ public class ClientViaVersion {
 	public static int spoofedVersion = CLIENT_PROTOCOL_VERSION;
 	public static List<ProtocolVersion> supportedVersion;
 	public static ProtocolVersion selected;
-	public static boolean shieldBlocking = true;
 
 	public static UserConnection user;
 	public static Object networkManager;
+	public static boolean blockingOnNewServers = false;
 
 	private static String title = Display.getTitle();
 
@@ -120,6 +122,8 @@ public class ClientViaVersion {
 
 	@EventHandler
 	public void onLoad(LoadEvent e) {
+		blockingOnNewServers = new File(The5zigMod.getVars().getMinecraftDataDirectory(), "blockingOnNewServers").exists();
+
 		ClientViaVersion.LOGGER.info("Minecraft Version: " + The5zigAPI.getAPI().getMinecraftVersion());
 		ClientViaVersion.LOGGER.info("5zig Version: " + The5zigAPI.getAPI().getModVersion());
 		ClientViaVersion.LOGGER.info("Forge installed: " + The5zigAPI.getAPI().isForgeEnvironment());

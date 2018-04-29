@@ -60,8 +60,11 @@ public class Injector {
 
 			@Override
 			public boolean isEnabled(Level testLevel, Marker marker, String msg, Throwable t) {
-				if (msg.startsWith("push")) {
+				if (msg.equals("push")) {
 					return ClientViaVersion.spoofedVersion<=47;
+				}
+				if (msg.equals("block")) {
+					return ClientViaVersion.spoofedVersion<=47 || ClientViaVersion.blockingOnNewServers;
 				}
 				return super.isEnabled(testLevel, marker, msg, t);
 			}

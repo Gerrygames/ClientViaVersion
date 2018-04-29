@@ -232,7 +232,7 @@ public class SwordPatcher {
 			mv.visitVarInsn(ALOAD, 3);
 			mv.visitInsn(ACONST_NULL);
 			mv.visitInsn(ACONST_NULL);
-			mv.visitLdcInsn("push1");
+			mv.visitLdcInsn("block");
 			mv.visitInsn(ACONST_NULL);
 			mv.visitTypeInsn(CHECKCAST, "java/lang/Throwable");
 			mv.visitMethodInsn(INVOKEVIRTUAL, "org/apache/logging/log4j/simple/SimpleLogger", "isEnabled", "(Lorg/apache/logging/log4j/Level;Lorg/apache/logging/log4j/Marker;Ljava/lang/String;Ljava/lang/Throwable;)Z", false);
@@ -295,7 +295,7 @@ public class SwordPatcher {
 			mv.visitVarInsn(ALOAD, 5);
 			mv.visitInsn(ACONST_NULL);
 			mv.visitInsn(ACONST_NULL);
-			mv.visitLdcInsn("push2");
+			mv.visitLdcInsn("block");
 			mv.visitInsn(ACONST_NULL);
 			mv.visitTypeInsn(CHECKCAST, "java/lang/Throwable");
 			mv.visitMethodInsn(INVOKEVIRTUAL, "org/apache/logging/log4j/simple/SimpleLogger", "isEnabled", "(Lorg/apache/logging/log4j/Level;Lorg/apache/logging/log4j/Marker;Ljava/lang/String;Ljava/lang/Throwable;)Z", false);

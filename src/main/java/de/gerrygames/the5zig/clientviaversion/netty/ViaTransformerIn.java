@@ -27,6 +27,9 @@ public class ViaTransformerIn extends ByteToMessageDecoder {
 	protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
 		if (in.readableBytes()==0 || ClientViaVersion.user==null) return;
 		int packetId =  Type.VAR_INT.read(in);
+
+		//ClientViaVersion.LOGGER.info("Incoming Packet: id={}, size={}", Integer.toHexString(packetId), in.readableBytes());
+
 		State state = Utils.getConnectionState(ctx.channel());
 		ClientViaVersion.user.get(ProtocolInfo.class).setState(state);
 
