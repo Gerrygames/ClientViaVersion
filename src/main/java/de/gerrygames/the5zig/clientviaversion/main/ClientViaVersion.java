@@ -95,12 +95,7 @@ public class ClientViaVersion {
 	}
 
 	private static void setTitle(String title) {
-		Scheduler.runTask(new Runnable() {
-			@Override
-			public void run() {
-				Display.setTitle(title);
-			}
-		});
+		Scheduler.runTask(() -> Display.setTitle(title));
 	}
 
 	@EventHandler
@@ -161,12 +156,7 @@ public class ClientViaVersion {
 		supportedVersion = new ArrayList<>(ProtocolVersion.getProtocols());
 		supportedVersion.removeIf(pv -> ClientViaVersion.CLIENT_PROTOCOL_VERSION !=pv.getId() && ProtocolRegistry.getProtocolPath(ClientViaVersion.CLIENT_PROTOCOL_VERSION, pv.getId()) == null);
 
-		supportedVersion.sort(new Comparator<ProtocolVersion>() {
-			@Override
-			public int compare(ProtocolVersion v1, ProtocolVersion v2) {
-				return Integer.compare(v1.getId(), v2.getId());
-			}
-		});
+		supportedVersion.sort(Comparator.comparingInt(ProtocolVersion::getId));
 
 		selected = ProtocolVersion.getProtocol(CLIENT_PROTOCOL_VERSION);
 
