@@ -1,5 +1,8 @@
 # ClientViaVersion
 
+**This project is discontinued**  
+There is however a new project called [ViaFabric](https://github.com/ViaVersion/ViaFabric) by [creeper123123321](https://github.com/creeper123123321).
+
 **General Information**  
 This is a plugin for [The 5zig Mod](https://5zig.net) implementing [ViaVersion](https://github.com/MylesIsCool/ViaVersion) and [ViaBackwards](https://github.com/Matsv/ViaBackwards).
 This allows you to connect to Minecraft server which protocol (version) does not match/support your client version.
